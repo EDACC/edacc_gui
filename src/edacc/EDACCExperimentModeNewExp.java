@@ -44,7 +44,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public boolean isConfigurationExp;
     public boolean canceled;
     public boolean minimize;
-    public Float costPenalty;
+    public Double costPenalty;
     private VerifierParameterTableModel verifierParameterTableModel;
 
     /** Creates new form EDACCExperimentModeNewExp */
@@ -116,7 +116,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         txtPenalty.setText("0");
     }
     
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, List<Cost> costs, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost, boolean minimize, Float costPenalty) {
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, List<Cost> costs, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost, boolean minimize, Double costPenalty) {
         this(parent, modal, verifiers, costs);
         
         if (cost != null) {
@@ -716,7 +716,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             }
             if (minimize) {
                 if (Experiment.Cost.cost.equals(defaultCost)) {
-                    costPenalty = Float.parseFloat(txtPenalty.getText());
+                    costPenalty = Double.parseDouble(txtPenalty.getText());
                 } else {
                     costPenalty = null;
                 }

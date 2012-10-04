@@ -56,13 +56,13 @@ public class ExperimentResultDAO {
             + "dest.verifierExitCode = src.verifierExitCode "
             + "WHERE src.ExperimentResults_idJob = ? AND dest.ExperimentResults_idJob = ?";
 
-    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, float cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) throws SQLException {
+    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, double cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) throws SQLException {
         ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, resultTime, wallTime, cost, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit);
         r.setNew();
         return r;
     }
 
-    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float resultTime, float wallTime, float cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float resultTime, float wallTime, double cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
         ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, resultTime, wallTime, cost, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, solverOutput, launcherOutput, watcherOutput, verifierOutput);
         r.setNew();
         return r;
@@ -183,7 +183,7 @@ public class ExperimentResultDAO {
                 st.setInt(curCount++, r.getPriority());
                 st.setFloat(curCount++, r.getResultTime());
                 st.setFloat(curCount++, r.getWallTime());
-                st.setFloat(curCount++, r.getCost());
+                st.setDouble(curCount++, r.getCost());
                 st.setInt(curCount++, r.getComputeQueue());
                 st.setInt(curCount++, r.getResultCode().getResultCode());
 

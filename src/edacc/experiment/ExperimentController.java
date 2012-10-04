@@ -319,7 +319,7 @@ public class ExperimentController {
      * @throws PropertyTypeNotExistException
      * @throws ComputationMethodDoesNotExistException 
      */
-    public Experiment createExperiment(String name, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost, boolean minimize, Float costPenalty) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+    public Experiment createExperiment(String name, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost, boolean minimize, Double costPenalty) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
         Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp, defaultCost, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast, cost == null ? null : cost.getId(), minimize, costPenalty);
         if (verifierConfig != null) {
@@ -2127,7 +2127,7 @@ public class ExperimentController {
         experimentResultCache.updateExperimentResults();
         task.setStatus("Calculating..");
         for (SolverConfiguration solverConfig : solverConfigs) {
-            Float cost = cFunction.calculateCost(experimentResultCache.getResults(solverConfig.getId()));
+            Double cost = cFunction.calculateCost(experimentResultCache.getResults(solverConfig.getId()));
             solverConfig.setCost(cost);
             solverConfig.setCost_function(cFunction.databaseRepresentation());
         }

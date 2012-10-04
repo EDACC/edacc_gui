@@ -34,7 +34,7 @@ public class SolverConfigurationDAO {
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
         i.setName(rs.getString("name"));
-        i.setCost(rs.getFloat("cost"));
+        i.setCost(rs.getDouble("cost"));
         if (rs.wasNull()) {
             i.setCost(null);
         }
@@ -61,9 +61,9 @@ public class SolverConfigurationDAO {
             st.setInt(3, i.getSeed_group());
             st.setString(4, i.getName());
             if (i.getCost() == null) {
-                st.setNull(5, java.sql.Types.FLOAT);
+                st.setNull(5, java.sql.Types.DOUBLE);
             } else {
-                st.setFloat(5, i.getCost());
+                st.setDouble(5, i.getCost());
             }
             st.setString(6, i.getCost_function());
             st.setString(7, i.getParameter_hash());
@@ -83,9 +83,9 @@ public class SolverConfigurationDAO {
             st.setInt(2, i.getSeed_group());
             st.setString(3, i.getName());
             if (i.getCost() == null) {
-                st.setNull(4, java.sql.Types.FLOAT);
+                st.setNull(4, java.sql.Types.DOUBLE);
             } else {
-                st.setFloat(4, i.getCost());
+                st.setDouble(4, i.getCost());
             }
             st.setString(5, i.getCost_function());
             st.setString(6, i.getParameter_hash());
@@ -148,9 +148,9 @@ public class SolverConfigurationDAO {
                 stUpdate.setInt(2, sc.getSeed_group());
                 stUpdate.setString(3, sc.getName());
                 if (sc.getCost() == null) {
-                    stUpdate.setNull(4, java.sql.Types.FLOAT);
+                    stUpdate.setNull(4, java.sql.Types.DOUBLE);
                 } else {
-                    stUpdate.setFloat(4, sc.getCost());
+                    stUpdate.setDouble(4, sc.getCost());
                 }
                 stUpdate.setString(5, sc.getCost_function());
                 stUpdate.setString(6, sc.getParameter_hash());
@@ -163,9 +163,9 @@ public class SolverConfigurationDAO {
                 stInsert.setInt(posInsert++, sc.getSeed_group());
                 stInsert.setString(posInsert++, sc.getName());
                 if (sc.getCost() == null) {
-                    stInsert.setNull(posInsert++, java.sql.Types.FLOAT);
+                    stInsert.setNull(posInsert++, java.sql.Types.DOUBLE);
                 } else {
-                    stInsert.setFloat(posInsert++, sc.getCost());
+                    stInsert.setDouble(posInsert++, sc.getCost());
                 }
                 stInsert.setString(posInsert++, sc.getCost_function());
                 stInsert.setString(posInsert++, sc.getParameter_hash());
@@ -219,7 +219,7 @@ public class SolverConfigurationDAO {
         return createSolverConfiguration(solverBinary, experimentId, seed_group, name, hint, null, null, null);
     }
 
-    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, String hint, Float cost, String cost_function, String parameter_hash) throws SQLException, Exception {
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, String hint, Double cost, String cost_function, String parameter_hash) throws SQLException, Exception {
         if (solverBinary == null) {
             throw new Exception("Solver binary missing.");
         }

@@ -9,7 +9,7 @@ public interface CostFunction {
      * @param job
      * @return the value according to the stat function
      */
-	public float singleCost(edacc.model.ExperimentResult job);
+	public double singleCost(edacc.model.ExperimentResult job);
 		
 	/**
      * Calculate the value of the cost function over the list of
@@ -17,7 +17,7 @@ public interface CostFunction {
      * @param results
      * @return
      */
-	public float calculateCost(List<edacc.model.ExperimentResult> results);
+	public double calculateCost(List<edacc.model.ExperimentResult> results);
 	
 	/**
      * Calculate the cumulated value of the costs over the list of
@@ -25,7 +25,7 @@ public interface CostFunction {
      * @param results
      * @return cumulated costs
      */
-	public float calculateCumulatedCost(List<edacc.model.ExperimentResult> results);
+	public double calculateCumulatedCost(List<edacc.model.ExperimentResult> results);
 	
 	/**
 	 * Returns a string that uniquely identifies the cost function type

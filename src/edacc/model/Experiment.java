@@ -19,7 +19,7 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
     private Integer idCost;
     private boolean minimize;
-    private Float costPenalty;
+    private Double costPenalty;
     // only used for export
     public List<ExperimentHasInstance> instances;
     protected ConfigurationScenario scenario;
@@ -233,11 +233,11 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
         }
     }
 
-    public Float getCostPenalty() {
+    public Double getCostPenalty() {
         return costPenalty;
     }
 
-    public void setCostPenalty(Float costPenalty) {
+    public void setCostPenalty(Double costPenalty) {
         this.costPenalty = costPenalty;
         if (isSaved()) {
             setModified();

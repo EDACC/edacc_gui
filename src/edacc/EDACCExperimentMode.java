@@ -425,6 +425,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableJobs.setDefaultRenderer(String.class, tableJobsStringRenderer);
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(Double.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.addKeyListener(new java.awt.event.KeyAdapter() {
 
             @Override
@@ -3122,7 +3123,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 Integer oldVOPL = exp.getVerifierOutputPreserveLast();
                 Integer oldIdCost = exp.getIdCost();
                 boolean oldMinimize = exp.getMinimize();
-                Float oldPenalty = exp.getCostPenalty();
+                Double oldPenalty = exp.getCostPenalty();
                 exp.setName(dialogEditExp.expName);
                 exp.setDescription(dialogEditExp.expDesc);
                 exp.setDefaultCost(dialogEditExp.defaultCost);

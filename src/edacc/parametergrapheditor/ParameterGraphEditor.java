@@ -34,9 +34,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +48,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -468,6 +474,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         btnDefaultGraph = new javax.swing.JButton();
         btnSaveToFile = new javax.swing.JButton();
         btnLoadFromFile = new javax.swing.JButton();
+        btnImportSMACStyleParams = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -526,6 +533,14 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
         });
 
+        btnImportSMACStyleParams.setText(resourceMap.getString("btnImportSMACStyleParams.text")); // NOI18N
+        btnImportSMACStyleParams.setName("btnImportSMACStyleParams"); // NOI18N
+        btnImportSMACStyleParams.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImportSMACStyleParamsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -541,7 +556,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 .addComponent(btnSaveToFile)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnLoadFromFile)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnImportSMACStyleParams)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSave)
                 .addContainerGap())
         );
@@ -554,7 +571,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                     .addComponent(btnParameters)
                     .addComponent(btnDefaultGraph)
                     .addComponent(btnSaveToFile)
-                    .addComponent(btnLoadFromFile))
+                    .addComponent(btnLoadFromFile)
+                    .addComponent(btnImportSMACStyleParams))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
@@ -565,7 +583,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -791,6 +809,58 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnLoadFromFileActionPerformed
 
+    private void btnImportSMACStyleParamsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportSMACStyleParamsActionPerformed
+        JFileChooser fc = new JFileChooser();
+        fc.showOpenDialog(this);
+        if (fc.getSelectedFile() != null) {
+            try {
+                parameters = new HashSet<Parameter>();
+                
+                BufferedReader rdr = new BufferedReader(new InputStreamReader(new FileInputStream(fc.getSelectedFile()), "UTF-8"));
+                String line;
+                while ((line = rdr.readLine()) != null) {
+                    if (line.startsWith("Conditionals")) break;
+                    if (line.startsWith("#") || line.isEmpty()) continue;
+                    
+                    String param = line.split(" ")[0];
+                    if (line.charAt(param.length() + 1) == '[') {
+                        int endIx = line.indexOf(']', param.length() + 2);
+                        String range = line.substring(param.length() + 2, endIx);
+                        
+                        int endDefaultIx = line.indexOf(']', endIx + 1);
+                        boolean isInt = line.charAt(endDefaultIx + 1) == 'i';
+                        
+                        Parameter p = null;
+                        if (isInt) {
+                            int low = Integer.valueOf(range.split(",")[0]);
+                            int high = Integer.valueOf(range.split(",")[1]);
+                            p = new Parameter(param, new IntegerDomain(low, high));
+                        } else {
+                            double low = Double.valueOf(range.split(",")[0]);
+                            double high = Double.valueOf(range.split(",")[1]);
+                            p = new Parameter(param, new RealDomain(low, high));
+                        }
+                        parameters.add(p);
+                    } else if (line.charAt(param.length() + 1) == '{') {
+                        int endIx = line.indexOf('}', param.length() + 2);
+                        String[] vals = line.substring(param.length() + 2, endIx).split(",");
+                        
+                        Parameter p = new Parameter(param, new CategoricalDomain(vals));
+                        parameters.add(p);
+                    }
+                }
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            JOptionPane.showMessageDialog(ParameterGraphEditor.this, "Parameter domains imported", "Parameter domains imported", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btnImportSMACStyleParamsActionPerformed
+
     public void evtKeyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
             for (Object cell : graph.getSelectionCells()) {
@@ -852,6 +922,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDefaultGraph;
+    private javax.swing.JButton btnImportSMACStyleParams;
     private javax.swing.JButton btnLayout;
     private javax.swing.JButton btnLoadFromFile;
     private javax.swing.JButton btnParameters;

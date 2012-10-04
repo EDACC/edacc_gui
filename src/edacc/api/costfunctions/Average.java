@@ -15,7 +15,7 @@ public class Average implements CostFunction {
     }
     
 	@Override
-	public float singleCost(edacc.model.ExperimentResult job){
+	public double singleCost(edacc.model.ExperimentResult job){
         if (costType.equals(Experiment.Cost.resultTime)) 
             return job.getResultTime();
         else if (costType.equals(Experiment.Cost.wallTime))
@@ -25,16 +25,16 @@ public class Average implements CostFunction {
 	}
 	
 	@Override
-	public float calculateCost(List<ExperimentResult> results) {
-		float sum = 0.0f;
+	public double calculateCost(List<ExperimentResult> results) {
+		double sum = 0.0f;
 		if (results.size() == 0) return 0;
 		for (ExperimentResult res: results) 
 				sum += singleCost(res);
 		return sum / results.size();
 	}
 	@Override
-	public float calculateCumulatedCost(List<ExperimentResult> results) {
-		float sum = 0.0f;
+	public double calculateCumulatedCost(List<ExperimentResult> results) {
+		double sum = 0.0f;
 		if (results.size() == 0) return 0;
 		for (ExperimentResult res: results) 
 			if (res.getStatus().getStatusCode() > 0)

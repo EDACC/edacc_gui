@@ -12,7 +12,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel, Se
     private int id;
     private int seed_group;
     private String name;
-    private Float cost;
+    private Double cost;
     private String cost_function;
     private String parameter_hash;
     private String hint;
@@ -38,11 +38,11 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel, Se
         hint = sc.hint;
     }
     
-    public Float getCost() {
+    public Double getCost() {
         return cost;
     }
 
-    public void setCost(Float cost) {
+    public void setCost(Double cost) {
         if (this.isSaved() && (cost == null && this.cost != null || !cost.equals(this.cost))) {
             this.setModified();
         }

@@ -19,7 +19,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int seed;
     private float resultTime;
     private float wallTime;
-    private float cost;
+    private double cost;
     private int SolverConfigId;
     private int ExperimentId;
     private int InstanceId;
@@ -43,7 +43,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         super();
     }
 
-    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, float cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) {
+    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, double cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) {
         this();
         this.run = run;
         this.priority = priority;
@@ -232,11 +232,11 @@ public class ExperimentResult extends BaseModel implements Serializable {
         }
     }
 
-    public float getCost() {
+    public double getCost() {
         return cost;
     }
 
-    public void setCost(float cost) {
+    public void setCost(double cost) {
         this.cost = cost;
         if (this.isSaved()) {
             this.setModified();

@@ -17,7 +17,7 @@ public class Median implements CostFunction {
     }
     
 	@Override
-	public float singleCost(edacc.model.ExperimentResult job){
+	public double singleCost(edacc.model.ExperimentResult job){
 	    if (costType.equals(Experiment.Cost.resultTime)) 
 	        return job.getResultTime();
 	    else if (costType.equals(Experiment.Cost.wallTime))
@@ -27,10 +27,10 @@ public class Median implements CostFunction {
 	}
 	
 	@Override
-	public float calculateCost(List<ExperimentResult> results) {
+	public double calculateCost(List<ExperimentResult> results) {
 		if (results.size() == 0)
 			return 0;
-		List<Float> vals = new ArrayList<Float>();
+		List<Double> vals = new ArrayList<Double>();
 		for (ExperimentResult res : results) {
 				vals.add(singleCost(res));
 		}
@@ -39,8 +39,8 @@ public class Median implements CostFunction {
 	}
 
 	@Override
-	public float calculateCumulatedCost(List<ExperimentResult> results) {
-		float sum = 0.0f;
+	public double calculateCumulatedCost(List<ExperimentResult> results) {
+		double sum = 0.0f;
 		if (results.size() == 0)
 			return 0;
 		for (ExperimentResult res : results)

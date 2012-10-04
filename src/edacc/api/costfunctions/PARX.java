@@ -9,12 +9,12 @@ public class PARX implements CostFunction {
 	private int penaltyFactor;
     private boolean minimize;
     private Experiment.Cost costType;
-    private float costPenaltyValue;
+    private double costPenaltyValue;
     
     /**
      * Default constructor initialising the PARX cost function to PAR10.
      */
-    public PARX(Experiment.Cost costType, boolean minimize, float costPenaltyValue) {
+    public PARX(Experiment.Cost costType, boolean minimize, double costPenaltyValue) {
         this.minimize = minimize;
         this.costType = costType;
         this.costPenaltyValue = costPenaltyValue;
@@ -27,7 +27,7 @@ public class PARX implements CostFunction {
 	 * 
 	 * @param penaltyFactor
 	 */
-	public PARX(Experiment.Cost costType, boolean minimize, float costPenaltyValue, int penaltyFactor) {
+	public PARX(Experiment.Cost costType, boolean minimize, double costPenaltyValue, int penaltyFactor) {
         this.minimize = minimize;
         this.costType = costType;
         this.costPenaltyValue = costPenaltyValue;
@@ -37,7 +37,7 @@ public class PARX implements CostFunction {
 	}
 	
 	@Override
-	public float singleCost(edacc.model.ExperimentResult job){
+	public double singleCost(edacc.model.ExperimentResult job){
 		if (String.valueOf(job.getResultCode().getResultCode()).startsWith("1")) {
 		    if (costType.equals(Experiment.Cost.resultTime))
 		        return job.getResultTime();
@@ -47,9 +47,9 @@ public class PARX implements CostFunction {
 		        return job.getCost();
 		} else {
 		    if (costType.equals(Experiment.Cost.resultTime))
-		        return job.getCPUTimeLimit() * (float) penaltyFactor;
+		        return job.getCPUTimeLimit() * (double) penaltyFactor;
 		    else if (costType.equals(Experiment.Cost.wallTime)) 
-		        return job.getWallClockTimeLimit() * (float) penaltyFactor;
+		        return job.getWallClockTimeLimit() * (double) penaltyFactor;
 		    else
 		        return costPenaltyValue * penaltyFactor;
 		}
@@ -60,8 +60,8 @@ public class PARX implements CostFunction {
 	 * Running, not started or crashed jobs are not used for the computation!
 	 */
 	@Override
-	public float calculateCost(List<ExperimentResult> results) {
-		float sum = 0.0f;
+	public double calculateCost(List<ExperimentResult> results) {
+		double sum = 0.0f;
 		int count = 0;
 		for (ExperimentResult res : results) {
 		    if (res.getStatus().getStatusCode() > 0) {
@@ -78,9 +78,9 @@ public class PARX implements CostFunction {
 	 * 
 	 */
 	@Override
-	public float calculateCumulatedCost(List<ExperimentResult> results) {
+	public double calculateCumulatedCost(List<ExperimentResult> results) {
 		// TODO: Take into account if the cost or runtime is wanted!
-		float sum = 0.0f;
+		double sum = 0.0f;
 		for (ExperimentResult res : results) {
 			if (res.getStatus().getStatusCode() > 0) {
 			    sum += singleCost(res);

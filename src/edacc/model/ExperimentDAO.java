@@ -37,7 +37,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, Integer idCost, boolean minimize, Float costPenalty) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, Integer idCost, boolean minimize, Double costPenalty) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -139,7 +139,7 @@ public class ExperimentDAO {
         if (experiment.getCostPenalty() == null) {
             st.setNull(16, java.sql.Types.FLOAT);
         } else {
-            st.setFloat(16, experiment.getCostPenalty());
+            st.setDouble(16, experiment.getCostPenalty());
         }
         st.executeUpdate();
         
@@ -212,7 +212,7 @@ public class ExperimentDAO {
             i.setIdCost(null);
         }
         i.setMinimize(rs.getBoolean("minimize"));
-        i.setCostPenalty(rs.getFloat("costPenalty"));
+        i.setCostPenalty(rs.getDouble("costPenalty"));
         if (rs.wasNull()) {
             i.setCostPenalty(null);
         }
