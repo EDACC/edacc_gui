@@ -544,7 +544,7 @@ public class ExperimentResultDAO {
         r.setStatus(StatusCodeDAO.getByStatusCode(rs.getInt("status")));
         r.setResultTime(rs.getFloat("resultTime"));
         r.setWallTime(rs.getFloat("wallTime"));
-        r.setCost(rs.getFloat("cost"));
+        r.setCost(rs.getDouble("cost"));
         r.setResultCode(ResultCodeDAO.getByResultCode(rs.getInt("resultCode")));
         // r.setSolverExitCode(rs.getInt("solverExitCode"));
         // r.setWatcherExitCode(rs.getInt("watcherExitCode"));
