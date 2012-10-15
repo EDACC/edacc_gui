@@ -2078,7 +2078,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-        // try select the parameter which stood on row over the deleted param
+        // try select the parameter which stood on row above the deleted param
         if (selectedIndex >= tableParameters.getRowCount()) {
             selectedIndex--;
         }

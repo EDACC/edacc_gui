@@ -57,6 +57,7 @@ public class ParameterTableModel extends AbstractTableModel{
     
     public void remove(Parameter param){
         parameters.get(currentSolver).remove(param);
+        fireTableDataChanged();
     }
 
     public int getRowCount() {
