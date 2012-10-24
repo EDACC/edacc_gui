@@ -1913,7 +1913,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     private void btnParametersNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersNewActionPerformed
         manageDBParameters.newParam();
-        int selIndex = tableParameters.getRowCount() - 1;
+        int selIndex = tableParameters.convertRowIndexToModel(tableParameters.getRowCount() - 1);
         tableParameters.getSelectionModel().setSelectionInterval(selIndex, selIndex);
         tableParameters.updateUI();
         unsavedChanges = true;
@@ -2078,7 +2078,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-        // try select the parameter which stood on row over the deleted param
+        // try select the parameter which stood on row above the deleted param
         if (selectedIndex >= tableParameters.getRowCount()) {
             selectedIndex--;
         }
