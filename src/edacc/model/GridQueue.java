@@ -32,6 +32,26 @@ public class GridQueue extends BaseModel implements IntegerPKModel {
     public GridQueue() {
         this.setNew();
     }
+    
+    public GridQueue(GridQueue other) {
+        this();
+        id = other.id;
+        name = other.name;
+        location = other.location;
+        numCPUs = other.numCPUs;
+        numCPUsPerJob = other.numCPUsPerJob;
+        description = other.description;
+        numCores = other.numCores;
+        numThreads = other.numThreads;
+        hyperthreading = other.hyperthreading;
+        turboboost = other.turboboost;
+        CPUName = other.CPUName;
+        cacheSize = other.cacheSize;
+        cpuflags = other.cpuflags;
+        memory = other.memory;
+        cpuinfo = other.cpuinfo;
+        meminfo = other.meminfo;
+    }
 
     public String getDescription() {
         return description;

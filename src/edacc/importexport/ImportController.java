@@ -1,5 +1,6 @@
 package edacc.importexport;
 
+import edacc.EDACCApp;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -135,6 +136,7 @@ public class ImportController implements ImportExportController {
             if (autoCommit) {
                 DatabaseConnector.getInstance().getConn().rollback();
             }
+            EDACCApp.getLogger().logException(ex);
             throw ex;
         } finally {
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);

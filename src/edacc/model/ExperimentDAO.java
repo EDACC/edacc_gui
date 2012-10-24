@@ -430,6 +430,7 @@ public class ExperimentDAO {
             
             if (experiment.verifierConfig != null) {
                 VerifierConfiguration vconfig = experiment.verifierConfig;
+                vconfig.setVerifier(verifierMap.get(vconfig.getVerifier().getId()));
                 vconfig.setIdExperiment(dbExperiment.getId());
                 vconfig.setNew();
                 for (VerifierParameterInstance pi : vconfig.getParameterInstances()) {

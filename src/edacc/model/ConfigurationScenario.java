@@ -17,7 +17,7 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel, 
         parameters = new ArrayList<ConfigurationScenarioParameter>();
     }
 
-    protected ConfigurationScenario(ConfigurationScenario scenario) {
+    public ConfigurationScenario(ConfigurationScenario scenario) {
         this();
         id = scenario.id;
         idExperiment = scenario.idExperiment;

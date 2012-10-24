@@ -25,7 +25,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel, Se
         super();
     }
     
-    protected SolverConfiguration(SolverConfiguration sc) {
+    public SolverConfiguration(SolverConfiguration sc) {
         this();
         solverBinary = sc.solverBinary;
         experiment_id = sc.experiment_id;

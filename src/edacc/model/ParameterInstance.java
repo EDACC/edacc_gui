@@ -11,7 +11,7 @@ public class ParameterInstance extends BaseModel implements Serializable {
         super();
     }
     
-    protected ParameterInstance(ParameterInstance pi) {
+    public ParameterInstance(ParameterInstance pi) {
         this();
         parameter_id = pi.parameter_id;
         solverConfiguration = pi.solverConfiguration;

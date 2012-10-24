@@ -129,6 +129,7 @@
                 <include name="edacc/satinstances/**"/>
                 <include name="edacc/experiment/Util*.*"/>
                 <include name="edacc/manageDB/Util*.*"/>
+                <include name="edacc/manageDB/FileInputStreamList.*"/>
                 <include name="**/*Exception*"/>
             </fileset>
             <fileset dir="${src.dir}" defaultexcludes="true">
