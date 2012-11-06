@@ -1916,6 +1916,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         int selIndex = tableParameters.convertRowIndexToView(tableParameters.getRowCount() - 1);
         tableParameters.getSelectionModel().setSelectionInterval(selIndex, selIndex);
         tableParameters.updateUI();
+        // scroll to currently selected index (the new parameter)
+        tableParameters.scrollRectToVisible(tableParameters.getCellRect(selIndex, 0, true));
         unsavedChanges = true;
         this.tfParametersName.requestFocus();
     }//GEN-LAST:event_btnParametersNewActionPerformed
