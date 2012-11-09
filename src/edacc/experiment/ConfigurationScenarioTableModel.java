@@ -129,7 +129,8 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
             }
         } else if (column == COL_FIXEDVALUE) {
             if ((Boolean) aValue) {
-                configScenarioParameters.get(parameters.get(row).getId()).setFixedValue("");
+                String defaultValue = parameters.get(row).getDefaultValue();
+                configScenarioParameters.get(parameters.get(row).getId()).setFixedValue(defaultValue == null ? "" : defaultValue);
             } else {
                 configScenarioParameters.get(parameters.get(row).getId()).setFixedValue(null);
             }
