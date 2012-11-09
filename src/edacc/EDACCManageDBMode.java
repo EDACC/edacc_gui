@@ -1913,9 +1913,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     private void btnParametersNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersNewActionPerformed
         manageDBParameters.newParam();
-        int selIndex = tableParameters.convertRowIndexToModel(tableParameters.getRowCount() - 1);
+        int selIndex = tableParameters.convertRowIndexToView(tableParameters.getRowCount() - 1);
         tableParameters.getSelectionModel().setSelectionInterval(selIndex, selIndex);
         tableParameters.updateUI();
+        // scroll to currently selected index (the new parameter)
+        tableParameters.scrollRectToVisible(tableParameters.getCellRect(selIndex, 0, true));
         unsavedChanges = true;
         this.tfParametersName.requestFocus();
     }//GEN-LAST:event_btnParametersNewActionPerformed
