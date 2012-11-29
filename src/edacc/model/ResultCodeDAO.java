@@ -3,7 +3,9 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  *
@@ -46,6 +48,27 @@ public class ResultCodeDAO {
                 throw new ResultCodeNotInDBException();
             }
         }
+    }
+
+    public static LinkedList<ResultCode> getAll() throws SQLException {
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table);
+        LinkedList<ResultCode> res = new LinkedList<ResultCode>();
+        while (rs.next()) {
+            int resultCode = rs.getInt("resultCode");
+            ResultCode c = cache.get(resultCode);
+            if (c != null) {
+                res.add(c);
+            } else {
+                ResultCode i = new ResultCode(resultCode, rs.getString("description"));
+                i.setSaved();
+                cache.put(resultCode, i);
+                res.add(i);
+            }
+
+        }
+        rs.close();
+        return res;
     }
 
     public static void initialize() throws SQLException {
