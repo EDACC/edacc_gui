@@ -27,7 +27,7 @@ public class ResultCode extends BaseModel implements Serializable {
     private int resultCode;
     private String description;
 
-    protected ResultCode (int resultCode, String description) {
+    public ResultCode (int resultCode, String description) {
         this.resultCode = resultCode;
         this.description = description;
     }
@@ -92,4 +92,5 @@ public class ResultCode extends BaseModel implements Serializable {
     public boolean isCorrect() {
         return String.valueOf(resultCode).startsWith("1");
     }
+
 }

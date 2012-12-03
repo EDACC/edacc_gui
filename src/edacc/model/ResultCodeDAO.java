@@ -41,6 +41,7 @@ public class ResultCodeDAO {
                 cache.put(resultCode, result);
                 rs.close();
                 st.close();
+                result.setSaved();
                 return result;
             } else {
                 rs.close();
@@ -87,4 +88,5 @@ public class ResultCodeDAO {
             cache.put(result.getResultCode(), result);
         }
     }
+    
 }

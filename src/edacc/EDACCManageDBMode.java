@@ -331,7 +331,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jPanel8 = new javax.swing.JPanel();
         bResultCodesNew = new javax.swing.JButton();
         bResultCodesDelete = new javax.swing.JButton();
-        bResultCodesEdit = new javax.swing.JButton();
 
         jFileChooserManageDBInstance.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserManageDBInstance.setMultiSelectionEnabled(true);
@@ -1779,12 +1778,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         bResultCodesNew.setText(resourceMap.getString("bResultCodesNew.text")); // NOI18N
         bResultCodesNew.setName("bResultCodesNew"); // NOI18N
+        bResultCodesNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bResultCodesNewActionPerformed(evt);
+            }
+        });
 
         bResultCodesDelete.setText(resourceMap.getString("bResultCodesDelete.text")); // NOI18N
         bResultCodesDelete.setName("bResultCodesDelete"); // NOI18N
-
-        bResultCodesEdit.setText(resourceMap.getString("bResultCodesEdit.text")); // NOI18N
-        bResultCodesEdit.setName("bResultCodesEdit"); // NOI18N
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -1793,9 +1794,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(bResultCodesNew)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bResultCodesEdit)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 297, Short.MAX_VALUE)
                 .addComponent(bResultCodesDelete)
                 .addContainerGap())
         );
@@ -1805,8 +1804,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bResultCodesNew)
-                    .addComponent(bResultCodesDelete)
-                    .addComponent(bResultCodesEdit))
+                    .addComponent(bResultCodesDelete))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1818,7 +1816,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 .addGroup(panelManageDBResultCodesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelManageDBResultCodesLayout.createSequentialGroup()
                         .addGap(12, 12, 12)
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE))
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE))
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2755,6 +2753,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         }
     }//GEN-LAST:event_tableVerifiersMouseClicked
 
+    private EDACCResultCodeDlg resultCodeDlg;
+    private void bResultCodesNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bResultCodesNewActionPerformed
+        if (resultCodeDlg == null)
+            resultCodeDlg = new EDACCResultCodeDlg(EDACCApp.getApplication().getMainFrame(), true);
+        resultCodeDlg.setVisible(true);
+    }//GEN-LAST:event_bResultCodesNewActionPerformed
+
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();
 
@@ -2909,7 +2914,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bImportParamsOfSolver;
     private javax.swing.JButton bResultCodesDelete;
-    private javax.swing.JButton bResultCodesEdit;
     private javax.swing.JButton bResultCodesNew;
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnAddInstances1;

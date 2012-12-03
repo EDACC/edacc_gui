@@ -2065,7 +2065,7 @@
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                              <Component id="jScrollPane7" pref="447" max="32767" attributes="0"/>
+                              <Component id="jScrollPane7" pref="455" max="32767" attributes="0"/>
                           </Group>
                           <Component id="jPanel8" alignment="1" max="32767" attributes="0"/>
                       </Group>
@@ -2119,9 +2119,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="bResultCodesNew" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="bResultCodesEdit" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="222" max="32767" attributes="0"/>
+                          <EmptySpace pref="297" max="32767" attributes="0"/>
                           <Component id="bResultCodesDelete" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -2134,7 +2132,6 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="bResultCodesNew" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="bResultCodesDelete" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="bResultCodesEdit" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -2147,17 +2144,14 @@
                     <Property name="text" type="java.lang.String" resourceKey="bResultCodesNew.text"/>
                     <Property name="name" type="java.lang.String" value="bResultCodesNew" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bResultCodesNewActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="bResultCodesDelete">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="bResultCodesDelete.text"/>
                     <Property name="name" type="java.lang.String" value="bResultCodesDelete" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="bResultCodesEdit">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="bResultCodesEdit.text"/>
-                    <Property name="name" type="java.lang.String" value="bResultCodesEdit" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>
