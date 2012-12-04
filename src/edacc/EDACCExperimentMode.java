@@ -79,11 +79,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -4062,9 +4064,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      * @param count the number of instances to be selected
      * @throws Exception if their are less then instances than count in the instances table an exception is thrown.
      */
-    public void randomInstanceSelection(int count) throws Exception {
+    public void randomInstanceSelection(int count, boolean onlySelected) throws Exception {
         LinkedList<Integer> idxs = new LinkedList<Integer>();
+        
+        Set<Integer> selectedRows = new HashSet<Integer>();
+        if (onlySelected) {
+            for (int row : tableInstances.getSelectedRows()) {
+                selectedRows.add(row);
+            }
+        }
+        
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
+            if (onlySelected && !selectedRows.contains(i)) {
+                continue;
+            }
+            
             if (!(Boolean) tableInstances.getValueAt(i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED))) {
                 idxs.add(i);
             }

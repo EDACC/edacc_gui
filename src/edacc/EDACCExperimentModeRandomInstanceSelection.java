@@ -8,7 +8,6 @@ package edacc;
 import edacc.experiment.Util;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import org.jdesktop.application.Action;
 
 /**
  *
@@ -34,9 +33,9 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    btnSelect();
+                    btnSelectActionPerformed(null);
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    btnCancel();
+                    btnCancelActionPerformed(null);
                 }
             }
 
@@ -62,6 +61,7 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
         btnCancel = new javax.swing.JButton();
         btnSelect = new javax.swing.JButton();
         txtCount = new javax.swing.JTextField();
+        chkSelectedInstances = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeRandomInstanceSelection.class);
@@ -77,15 +77,29 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
 
         btnSelect.setAction(actionMap.get("btnSelect")); // NOI18N
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
+        btnSelect.setActionCommand(resourceMap.getString("btnSelect.actionCommand")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnSelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectActionPerformed(evt);
+            }
+        });
 
         txtCount.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtCount.setText(resourceMap.getString("txtCount.text")); // NOI18N
         txtCount.setName("txtCount"); // NOI18N
+
+        chkSelectedInstances.setText(resourceMap.getString("chkSelectedInstances.text")); // NOI18N
+        chkSelectedInstances.setName("chkSelectedInstances"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -94,14 +108,16 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCount, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkSelectedInstances, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+                            .addComponent(txtCount, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -112,24 +128,20 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
                     .addComponent(jLabel1)
                     .addComponent(txtCount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkSelectedInstances)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    @Action
-    public void btnCancel() {
-        this.dispose();
-    }
-
-    @Action
-    public void btnSelect() {
+private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
         try {
-            expMode.randomInstanceSelection(Integer.parseInt(txtCount.getText()));
+            expMode.randomInstanceSelection(Integer.parseInt(txtCount.getText()), chkSelectedInstances.isSelected());
             this.dispose();
         } catch (NumberFormatException ex) {
             txtCount.selectAll();
@@ -138,10 +150,16 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
             txtCount.selectAll();
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Random Instance Selection", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
-    }
+}//GEN-LAST:event_btnSelectActionPerformed
+
+private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        this.dispose();
+}//GEN-LAST:event_btnCancelActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSelect;
+    private javax.swing.JCheckBox chkSelectedInstances;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField txtCount;
     // End of variables declaration//GEN-END:variables
