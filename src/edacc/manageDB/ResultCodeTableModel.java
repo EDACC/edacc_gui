@@ -6,13 +6,9 @@
 package edacc.manageDB;
 
 import edacc.model.ResultCode;
-import edacc.model.ResultCodeDAO;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import sun.security.jca.GetInstance;
 
 /**
  *
