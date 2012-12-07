@@ -194,12 +194,20 @@ public class ParameterGraph implements Serializable {
 			
 			if (config.getParameterValue(and_node.getParameter()) == null) {
 				config.setParameterValue(and_node.getParameter(), and_node.getDomain().randomValue(rng));
-			}
-			done_and.add(and_node);
-			
-			for (Node n: adjacentNodes(and_node)) {
-				if (n instanceof OrNode) L.add((OrNode)n);
-			}
+                                done_and.add(and_node);
+                                for (Node n: adjacentNodes(and_node)) {
+                                    if (n instanceof OrNode) L.add((OrNode)n);
+                                }
+			} else {
+                            for (AndNode an: adjacentAndNodes) {
+                                if (an.getDomain().contains(config.getParameterValue(an.getParameter()))) {
+                                    done_and.add(an);
+                                    for (Node n: adjacentNodes(an)) {
+                                        if (n instanceof OrNode) L.add((OrNode)n);
+                                    }
+                                }
+                            }   
+                        }
 		}
 		
 		config.updateChecksum();
