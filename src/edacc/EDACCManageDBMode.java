@@ -1952,9 +1952,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     private void btnSolverNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverNewActionPerformed
         manageDBSolvers.newSolver();
-        tableSolver.getRowSorter().setSortKeys(null);
-        tableSolver.getSelectionModel().setSelectionInterval(tableSolver.getRowCount() - 1, tableSolver.getRowCount() - 1);
+        //tableSolver.getRowSorter().setSortKeys(null); // delete sorting // not used any more
+        int selIndex = tableSolver.convertRowIndexToView(tableSolver.getRowCount() - 1);
+        tableSolver.getSelectionModel().setSelectionInterval(selIndex, selIndex);
         tableSolver.updateUI();
+        // scroll to currently selected index (the new solver)
+        tableSolver.scrollRectToVisible(tableSolver.getCellRect(selIndex, 0, true));
         unsavedChanges = true;
         tfSolverName.requestFocus();
     }//GEN-LAST:event_btnSolverNewActionPerformed
