@@ -82,4 +82,13 @@ public class ResultCodeTableModel extends AbstractTableModel {
         resultCodes.add(add);
         fireTableDataChanged();
     }
+
+    public ResultCode getResultCode(int i) {
+        return resultCodes.get(i);
+    }
+
+    void removeAll(Collection<ResultCode> rcs) {
+        resultCodes.removeAll(rcs);
+        fireTableDataChanged();
+    }
 }

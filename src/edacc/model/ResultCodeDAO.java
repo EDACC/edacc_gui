@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -70,6 +71,19 @@ public class ResultCodeDAO {
         }
         rs.close();
         return res;
+    }
+
+    public static void remove(Collection<ResultCode> codes) throws SQLException {
+        String list = "(";
+        StringBuilder b = new StringBuilder(list);
+        for (ResultCode r : codes) {
+            b.append(r.getResultCode());
+            b.append(",");
+        }
+        b.setCharAt(b.length() - 1, ')');
+        final String query = "DELETE FROM " + table + " WHERE resultCode in " + b.toString();
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        st.executeUpdate(query);
     }
 
     public static void initialize() throws SQLException {

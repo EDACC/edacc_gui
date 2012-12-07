@@ -8,6 +8,7 @@ package edacc.manageDB;
 import edacc.model.ResultCode;
 import edacc.model.ResultCodeDAO;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
 /**
  *
@@ -44,5 +45,14 @@ public class ManageDBResultCodes {
         ResultCode rc = new ResultCode(code, description);
         ResultCodeDAO.save(rc);
         ResultCodeTableModel.getInstance().add(rc);
+    }
+
+    public void remove(int[] sel) throws SQLException {
+        LinkedList<ResultCode> codes = new LinkedList<ResultCode>();
+        for (int i : sel) {
+            codes.add(ResultCodeTableModel.getInstance().getResultCode(i));
+        }
+        ResultCodeTableModel.getInstance().removeAll(codes);
+        ResultCodeDAO.remove(codes);
     }
 }

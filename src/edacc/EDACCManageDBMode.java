@@ -1786,6 +1786,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         bResultCodesDelete.setText(resourceMap.getString("bResultCodesDelete.text")); // NOI18N
         bResultCodesDelete.setName("bResultCodesDelete"); // NOI18N
+        bResultCodesDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bResultCodesDeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -2759,6 +2764,30 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             resultCodeDlg = new EDACCResultCodeDlg(EDACCApp.getApplication().getMainFrame(), true);
         resultCodeDlg.setVisible(true);
     }//GEN-LAST:event_bResultCodesNewActionPerformed
+
+    private void bResultCodesDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bResultCodesDeleteActionPerformed
+        if (JOptionPane.showConfirmDialog(EDACCApp.getApplication()
+                .getMainFrame(),
+                "Do you want to permanently remove the selected ResultCodes?",
+                "Remove ResultCodes",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+                == JOptionPane.YES_OPTION) {
+            try {
+                int[] sel = tableResultCodes.getSelectedRows();
+                // convert table indices to model indices
+                for (int i = 0; i < sel.length; i++) {
+                    sel[i] = tableResultCodes.convertRowIndexToModel(sel[i]);
+                }
+                ManageDBResultCodes.getInstance().remove(sel);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(EDACCApp.getApplication().
+                        getMainFrame(),
+                        "An error occured while deleting selected ResultCodes: "
+                        + ex.getMessage(),
+                        "Error while removing", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_bResultCodesDeleteActionPerformed
 
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();
