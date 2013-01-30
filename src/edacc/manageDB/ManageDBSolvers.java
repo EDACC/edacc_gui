@@ -487,12 +487,12 @@ public class ManageDBSolvers implements Observer {
                 name = b.getBinaryName() + "_" + b.getVersion();
             }
             // check for duplicate names
-            i = 1;
+            int j = 1;
             while (names.containsKey(name)) {
                 if (b.getVersion().equals("")) {
-                    name = name = b.getBinaryName() + "-" + i++;
+                    name = name = b.getBinaryName() + "-" + j++;
                 } else {
-                    name = b.getBinaryName() + "_" + b.getVersion() + "-" + i++;
+                    name = b.getBinaryName() + "_" + b.getVersion() + "-" + j++;
                 }
             }
             names.put(name, name);
@@ -516,6 +516,7 @@ public class ManageDBSolvers implements Observer {
         Vector<SolverBinaries> bins = s.getSolverBinaries();
         HashMap<String, String> names = new HashMap<String, String>();
         for (int i = 0; i < bins.size(); i++) {
+            System.out.println(i + ", " + s.getSolverBinaries().size());
             task.setTaskProgress((float) ++entryCounter / (float) numBins);
             SolverBinaries b = bins.get(i);
             InputStream binStream = SolverBinariesDAO.getZippedBinaryFile(b);
@@ -529,18 +530,18 @@ public class ManageDBSolvers implements Observer {
                 name = b.getBinaryName() + "_" + b.getVersion();
             }
             // check for duplicate names
-            i = 1;
+            int j = 1;
             while (names.containsKey(name)) {
                 if (b.getVersion().equals("")) {
-                    name = name = b.getBinaryName() + "-" + i++;
+                    name = name = b.getBinaryName() + "-" + j++;
                 } else {
-                    name = b.getBinaryName() + "_" + b.getVersion() + "-" + i++;
+                    name = b.getBinaryName() + "_" + b.getVersion() + "-" + j++;
                 }
             }
             names.put(name, name);
             // write binary entries
             while ((entry = zis.getNextEntry()) != null) {
-                ZipEntry newEntry = new ZipEntry(s.getName() + "/binaries/" + b.getBinaryName() + "_" + b.getVersion() + "/" + entry.getName());
+                ZipEntry newEntry = new ZipEntry(s.getName() + "/binaries/" + name + "/" + entry.getName());
                 zos.putNextEntry(newEntry);
                 for (int c = zis.read(); c != -1; c = zis.read()) {
                     zos.write(c);
