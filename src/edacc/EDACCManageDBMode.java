@@ -2245,8 +2245,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         if (exportFileChooser.showDialog(this, "Export code and binary of selected solvers to directory") == JFileChooser.APPROVE_OPTION) {
             int[] rows = tableSolver.getSelectedRows();
             Solver[] solvers = new Solver[rows.length];
-            for (int i : rows) {
-                solvers[i] = solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i));
+            for (int i = 0; i < rows.length; i++) {
+                solvers[i] = solverTableModel.getSolver(tableSolver.convertRowIndexToModel(rows[i]));
             }
             try {
                 manageDBSolvers.exportSolver(solvers, exportFileChooser.getSelectedFile());
