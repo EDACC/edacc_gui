@@ -816,7 +816,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tableSolver.setAutoCreateRowSorter(true);
         tableSolver.setMinimumSize(new java.awt.Dimension(50, 0));
         tableSolver.setName("tableSolver"); // NOI18N
-        tableSolver.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tableSolver.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jScrollPane2.setViewportView(tableSolver);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -1799,7 +1799,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(bResultCodesNew)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 297, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 289, Short.MAX_VALUE)
                 .addComponent(bResultCodesDelete)
                 .addContainerGap())
         );
@@ -1821,7 +1821,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 .addGroup(panelManageDBResultCodesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelManageDBResultCodesLayout.createSequentialGroup()
                         .addGap(12, 12, 12)
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE))
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE))
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2092,10 +2092,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 }
             }
         }
-        tfSolverName.setText("");
+        /* tfSolverName.setText("");
         taSolverDescription.setText("");
         tfSolverAuthors.setText("");
-        tfSolverVersion.setText("");
+        tfSolverVersion.setText(""); */
     }//GEN-LAST:event_btnSolverDeleteActionPerformed
     private void btnExportInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportInstancesActionPerformed
 
@@ -2244,17 +2244,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         if (exportFileChooser.showDialog(this, "Export code and binary of selected solvers to directory") == JFileChooser.APPROVE_OPTION) {
             int[] rows = tableSolver.getSelectedRows();
-
+            Solver[] solvers = new Solver[rows.length];
             for (int i : rows) {
-                try {
-                    manageDBSolvers.exportSolver(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)), exportFileChooser.getSelectedFile());
-                    manageDBSolvers.exportSolverCode(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)), exportFileChooser.getSelectedFile());
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this,
-                            "An error occured while exporting solver \"" + solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)).getName() + "\": " + ex.getMessage(),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+                solvers[i] = solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i));
+            }
+            try {
+                manageDBSolvers.exportSolver(solvers, exportFileChooser.getSelectedFile());
+
+                //manageDBSolvers.exportSolverCode(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)), exportFileChooser.getSelectedFile());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occured while exporting solvers: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnExport
@@ -2662,7 +2664,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             return;
         }
         final CostBinary binary = costBinaryTableModel.getCostBinary(tableCostBinaries.convertRowIndexToModel(selected));
-        
+
         Tasks.startTask(new TaskRunnable() {
 
             @Override
@@ -2671,7 +2673,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 task.setStatus("Loading cost binary..");
                 try {
                     manageDBCosts.setFileArrayOfCostBinary(binary);
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -2692,9 +2694,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                             }
 
                         }
-                        
                     });
-                    
+
                 } catch (final Exception ex) {
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -2709,7 +2710,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     });
                 }
             }
-            
         });
     }//GEN-LAST:event_btnCostEditBinaryActionPerformed
 
@@ -2760,17 +2760,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             btnEditVerifierActionPerformed(null);
         }
     }//GEN-LAST:event_tableVerifiersMouseClicked
-
     private EDACCResultCodeDlg resultCodeDlg;
     private void bResultCodesNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bResultCodesNewActionPerformed
-        if (resultCodeDlg == null)
+        if (resultCodeDlg == null) {
             resultCodeDlg = new EDACCResultCodeDlg(EDACCApp.getApplication().getMainFrame(), true);
+        }
         resultCodeDlg.setVisible(true);
     }//GEN-LAST:event_bResultCodesNewActionPerformed
 
     private void bResultCodesDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bResultCodesDeleteActionPerformed
-        if (JOptionPane.showConfirmDialog(EDACCApp.getApplication()
-                .getMainFrame(),
+        if (JOptionPane.showConfirmDialog(EDACCApp.getApplication().getMainFrame(),
                 "Do you want to permanently remove the selected ResultCodes?",
                 "Remove ResultCodes",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)

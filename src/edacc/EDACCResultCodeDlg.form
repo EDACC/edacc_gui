@@ -43,7 +43,7 @@
                       <Component id="bCancel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -83,15 +83,6 @@
         <Property name="name" type="java.lang.String" value="lDescription" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tfResultCode">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="tfResultCode.text"/>
-        <Property name="name" type="java.lang.String" value="tfResultCode" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tfResultCodeActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JTextField" name="tfDescription">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="tfDescription.text"/>
@@ -118,6 +109,12 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bCancelActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfResultCode">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="tfResultCode.text"/>
+        <Property name="name" type="java.lang.String" value="tfResultCode" noResource="true"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

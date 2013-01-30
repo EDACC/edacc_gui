@@ -41,10 +41,10 @@ public class EDACCResultCodeDlg extends javax.swing.JDialog {
 
         lResultCode = new javax.swing.JLabel();
         lDescription = new javax.swing.JLabel();
-        tfResultCode = new javax.swing.JTextField();
         tfDescription = new javax.swing.JTextField();
         bSave = new javax.swing.JButton();
         bCancel = new javax.swing.JButton();
+        tfResultCode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCResultCodeDlg.class);
@@ -56,14 +56,6 @@ public class EDACCResultCodeDlg extends javax.swing.JDialog {
 
         lDescription.setText(resourceMap.getString("lDescription.text")); // NOI18N
         lDescription.setName("lDescription"); // NOI18N
-
-        tfResultCode.setText(resourceMap.getString("tfResultCode.text")); // NOI18N
-        tfResultCode.setName("tfResultCode"); // NOI18N
-        tfResultCode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfResultCodeActionPerformed(evt);
-            }
-        });
 
         tfDescription.setText(resourceMap.getString("tfDescription.text")); // NOI18N
         tfDescription.setName("tfDescription"); // NOI18N
@@ -88,6 +80,9 @@ public class EDACCResultCodeDlg extends javax.swing.JDialog {
                 bCancelActionPerformed(evt);
             }
         });
+
+        tfResultCode.setText(resourceMap.getString("tfResultCode.text")); // NOI18N
+        tfResultCode.setName("tfResultCode"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -158,10 +153,6 @@ public class EDACCResultCodeDlg extends javax.swing.JDialog {
     private void bCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_bCancelActionPerformed
-
-    private void tfResultCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfResultCodeActionPerformed
-        tfDescription.requestFocus();
-    }//GEN-LAST:event_tfResultCodeActionPerformed
 
     private void tfDescriptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDescriptionActionPerformed
         bSaveActionPerformed(evt);
