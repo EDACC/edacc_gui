@@ -453,6 +453,7 @@ public class ManageDBSolvers implements Observer {
             numEntries += s.getSolverBinaries().size();
             numEntries += s.getCostBinaries().size();
         }
+        numEntries += solvers.length; // count code of solvers
 
         entryCounter = 0;
         int solverCounter = 1;
@@ -461,6 +462,8 @@ public class ManageDBSolvers implements Observer {
             exportSolverBinaries(s, task, zos, numEntries);
             task.setStatus("Exporting cost binaries of solver" + solverCounter + "/" + solvers.length);
             exportSolverCosts(s, task, zos, numEntries);
+            task.setStatus("Exporting code of solver" + solverCounter + "/" + solvers.length);
+            exportSolverCode(s, task, zos, numEntries);
             solverCounter++;
         }
         zos.close();
@@ -550,31 +553,44 @@ public class ManageDBSolvers implements Observer {
         }
     }
 
-    /** Exports the code of a solver.
-     * Creates a subdirectory in the directory specified by f named
-     * SolverName_code
-     * @param s solver, which code is to be exported
-     * @param f File specifiying the directory the code should be exported to
-     */
-    public void exportSolverCode(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        if (f.isDirectory()) {
-            f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getName() + "_code");
-        } else {
-            return;
+    private void exportSolverCode(Solver s, Tasks task, ZipOutputStream zos, int numBins) throws SQLException, IOException {
+        task.setTaskProgress((float) ++entryCounter / (float) numBins);
+        InputStream codeStream = SolverDAO.getZippedCodeFile(s);
+        if (codeStream == null) {
+            return; // no code for this solver
         }
-        SolverDAO.exportSolverCode(s, f);
+        ZipInputStream zis = new ZipInputStream(codeStream);
+        ZipEntry entry;
+
+        // write code entries
+        while ((entry = zis.getNextEntry()) != null) {
+            ZipEntry newEntry = new ZipEntry(s.getName() + "/src/" + entry.getName());
+            zos.putNextEntry(newEntry);
+            for (int c = zis.read(); c != -1; c = zis.read()) {
+                zos.write(c);
+            }
+            zos.closeEntry();
+            zis.closeEntry();
+        }
+        zis.close();
+        codeStream.close();
     }
 
     @Override
     public void update(Observable o, Object arg) {
         solverTableModel.clear();
+
+
     }
 
     public void removeSolverBinaries(Solver s) throws SQLException {
         SolverBinariesDAO.removeBinariesOfSolver(s);
+
+
     }
 
     void selectSolverBinary(boolean selected) {
         gui.enableSolverBinaryButtons(selected);
+
     }
 }

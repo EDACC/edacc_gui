@@ -677,4 +677,15 @@ public class SolverDAO {
         }
         return map;
     }
+
+    public static InputStream getZippedCodeFile(Solver s) throws SQLException {
+        final String query = "SELECT code FROM " + table + " WHERE idSolver=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, s.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getBinaryStream("code");
+        }
+        return null;
+    }
 }
