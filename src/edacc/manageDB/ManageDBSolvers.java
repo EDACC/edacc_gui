@@ -13,6 +13,7 @@ import edacc.model.CostDAO;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
+import edacc.model.ParameterGraphDAO;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverBinariesDAO;
@@ -20,6 +21,7 @@ import edacc.model.SolverDAO;
 import edacc.model.SolverNotInDBException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.parameterspace.graph.ParameterGraph;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -450,7 +452,7 @@ public class ManageDBSolvers implements Observer {
      * @throws SQLException
      * @throws IOException
      */
-    private void startExportSolverTask(Solver[] solvers, File f, Tasks task) throws FileNotFoundException, SQLException, IOException {
+    private void startExportSolverTask(Solver[] solvers, File f, Tasks task) throws FileNotFoundException, SQLException, IOException, JAXBException {
         task.setOperationName("Exporting solver");
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -482,6 +484,8 @@ public class ManageDBSolvers implements Observer {
             exportSolverCode(s, task, zos, numEntries);
             task.setStatus("Exporting parameters of solver" + solverCounter + "/" + solvers.length);
             exportSolverReadMe(s, task, zos, numEntries);
+            task.setStatus("Exporting parameter graph of solver" + solverCounter + "/" + solvers.length);
+            exportSolverParameterGraph(s, zos, numEntries);
             solverCounter++;
         }
         zos.close();
@@ -605,7 +609,6 @@ public class ManageDBSolvers implements Observer {
      * @throws IOException
      */
     private void exportSolverReadMe(Solver s, Tasks task, ZipOutputStream zos, int numBins) throws SQLException, IOException {
-        task.setTaskProgress((float) ++entryCounter / (float) numBins);
         Vector<Parameter> params = manageDBParameters.getParametersOfSolver(s);
         Vector<SolverBinaries> bins = s.getSolverBinaries();
 
@@ -647,8 +650,23 @@ public class ManageDBSolvers implements Observer {
         }
         pout.flush();
         zos.closeEntry();
-        pout.close();
     }
+
+    private void exportSolverParameterGraph(Solver s, ZipOutputStream zos, int numBins) throws SQLException, IOException, JAXBException {
+        ZipEntry newEntry = new ZipEntry(s.getName() + "/paramgraph-" + s.getName() + ".graph");
+        zos.putNextEntry(newEntry);
+
+        ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(s);
+        InputStream stream = ParameterGraphDAO.getParameterGraphXMLStream(graph);
+        byte[] buf = new byte[2048];
+        int len;
+        while ((len = stream.read(buf)) > 0) {
+            zos.write(buf, 0, len);
+        }
+        zos.closeEntry();
+        stream.close();
+    }
+
 
     @Override
     public void update(Observable o, Object arg) {

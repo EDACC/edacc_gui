@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -111,6 +112,10 @@ public class ParameterGraphDAO {
         }
         fo.close();
         stream.close();
+    }
+
+    public static InputStream getParameterGraphXMLStream(ParameterGraph graph) throws JAXBException { // wrapper for marshall
+        return marshall(ParameterGraph.class, graph);
     }
 
     public static void saveParameterGraph(ParameterGraph graph, Solver solver) throws SQLException, JAXBException {
