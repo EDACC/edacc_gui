@@ -20,6 +20,7 @@ import edacc.model.SolverDAO;
 import edacc.model.SolverNotInDBException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.SequenceInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -35,6 +38,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -432,10 +437,19 @@ public class ManageDBSolvers implements Observer {
                 }
             }
         }, true);
-
     }
     int entryCounter = 0;
 
+    /**
+     * Exports all solver binaries, cost binaries and code of the given solvers
+     * and shows a progress bar.
+     * @param solvers
+     * @param f
+     * @param task
+     * @throws FileNotFoundException
+     * @throws SQLException
+     * @throws IOException
+     */
     private void startExportSolverTask(Solver[] solvers, File f, Tasks task) throws FileNotFoundException, SQLException, IOException {
         task.setOperationName("Exporting solver");
 
@@ -448,6 +462,8 @@ public class ManageDBSolvers implements Observer {
             fos = new FileOutputStream(f);
         }
         ZipOutputStream zos = new ZipOutputStream(fos);
+
+        // calculate number of zip entries to be written
         int numEntries = 0;
         for (Solver s : solvers) {
             numEntries += s.getSolverBinaries().size();
@@ -464,6 +480,8 @@ public class ManageDBSolvers implements Observer {
             exportSolverCosts(s, task, zos, numEntries);
             task.setStatus("Exporting code of solver" + solverCounter + "/" + solvers.length);
             exportSolverCode(s, task, zos, numEntries);
+            task.setStatus("Exporting parameters of solver" + solverCounter + "/" + solvers.length);
+            exportSolverReadMe(s, task, zos, numEntries);
             solverCounter++;
         }
         zos.close();
@@ -516,7 +534,6 @@ public class ManageDBSolvers implements Observer {
         Vector<SolverBinaries> bins = s.getSolverBinaries();
         HashMap<String, String> names = new HashMap<String, String>();
         for (int i = 0; i < bins.size(); i++) {
-            System.out.println(i + ", " + s.getSolverBinaries().size());
             task.setTaskProgress((float) ++entryCounter / (float) numBins);
             SolverBinaries b = bins.get(i);
             InputStream binStream = SolverBinariesDAO.getZippedBinaryFile(b);
@@ -541,7 +558,7 @@ public class ManageDBSolvers implements Observer {
             names.put(name, name);
             // write binary entries
             while ((entry = zis.getNextEntry()) != null) {
-                ZipEntry newEntry = new ZipEntry(s.getName() + "/binaries/" + name + "/" + entry.getName());
+                ZipEntry newEntry = new ZipEntry(s.getName() + "/bin/" + name + "/" + entry.getName());
                 zos.putNextEntry(newEntry);
                 for (int c = zis.read(); c != -1; c = zis.read()) {
                     zos.write(c);
@@ -577,21 +594,81 @@ public class ManageDBSolvers implements Observer {
         codeStream.close();
     }
 
+    /**
+     * Exports a ReadMe-file which contains the start commands of each binary and
+     * all the solver parameters.
+     * @param s
+     * @param task
+     * @param zos
+     * @param numBins
+     * @throws SQLException
+     * @throws IOException
+     */
+    private void exportSolverReadMe(Solver s, Tasks task, ZipOutputStream zos, int numBins) throws SQLException, IOException {
+        task.setTaskProgress((float) ++entryCounter / (float) numBins);
+        Vector<Parameter> params = manageDBParameters.getParametersOfSolver(s);
+        Vector<SolverBinaries> bins = s.getSolverBinaries();
+
+        ZipEntry newEntry = new ZipEntry(s.getName() + "/ReadMe.txt");
+        zos.putNextEntry(newEntry);
+        PrintWriter pout = new PrintWriter(zos);
+        pout.println("This is the ReadMe-File of the solver " + s.getName());
+        pout.println("It has been created automatically by EDACC.");
+        pout.println();
+
+        pout.println("1. Solver Binaries");
+        pout.println("==================");
+        pout.println();
+        pout.println("The solver has been compiled to the following binary "
+                + "versions which can be found in the subdirectory \"bin\".");
+        pout.println("If the binary needs a specific run command (eg. java -jar), "
+                + "then this is mentioned in the following list.");
+        pout.println("The start commands are relative to the path of the binary, eg. bin/myBinary/.");
+        pout.println();
+        for (SolverBinaries b : bins) {
+            pout.println("* " + b.getBinaryName() + ": ");
+            String runCommand = "";
+            if (b.getRunCommand() != null)
+                runCommand = b.getRunCommand();
+            pout.println("\tStart command: " + runCommand + " ." + b.getRunPath());
+        }
+        pout.println();
+        pout.println("2. Parameters");
+        pout.println("=============");
+        pout.println();
+        pout.println("The solver binaries can be executed with the following commands: ");
+        pout.println();
+        pout.println("Order\tName\tPrefix\tboolean\tdefault value\tmandatory\tspace\t");
+        Collections.sort(params, new ParameterOrderComparator()); // sort params list by order
+        for (Parameter p : params) {
+            pout.println(p.getOrder() + "\t" + p.getName() + "\t" + p.getPrefix() + "\t"
+                    + (p.getHasValue() ? "X" : "") + "\t" + p.getDefaultValue()
+                    + "\t" + (p.isMandatory() ? "X" : "") + "\t" + (p.getSpace() ? "X" : ""));
+        }
+        pout.flush();
+        zos.closeEntry();
+        pout.close();
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         solverTableModel.clear();
-
-
     }
 
     public void removeSolverBinaries(Solver s) throws SQLException {
         SolverBinariesDAO.removeBinariesOfSolver(s);
-
-
     }
 
     void selectSolverBinary(boolean selected) {
         gui.enableSolverBinaryButtons(selected);
+    }
 
+    private class ParameterOrderComparator implements Comparator<Parameter> {
+
+        @Override
+        public int compare(Parameter p1, Parameter p2) {
+            return ((Integer) p1.getOrder()).compareTo(p2.getOrder());
+        }
+        
     }
 }
