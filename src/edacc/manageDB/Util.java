@@ -481,6 +481,19 @@ public class Util {
         }
     }
 
+    /**
+     * Removes the common prefix of a file array and returns the prefix.
+     * @param files
+     * @return
+     */
+    public static String removeCommonPrefix(File[] files) {
+        String lcp = getCommonPrefix(files);
+        for (int i = 0; i < files.length; i++) {
+            files[i] = new File(files[i].getAbsolutePath().replace(lcp, ""));
+        }
+        return lcp;
+    }
+
     private static String getCommonPrefix(File[] files) {
         final String separator = System.getProperty("file.separator");
         if (files == null || files.length == 0) {

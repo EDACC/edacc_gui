@@ -257,7 +257,7 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         String runCommand = tfRunCommand.getText();
         String runPath = (String) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex());
         if (runCommand != null)
-            lCommandPreview.setText(runCommand + " " + runPath);
+            lCommandPreview.setText(runCommand + " ." + runPath);
         else
             lCommandPreview.setText(runPath);
     }

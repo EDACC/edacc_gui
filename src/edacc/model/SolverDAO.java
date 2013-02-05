@@ -92,7 +92,7 @@ public class SolverDAO {
             ps.setString(2, solver.getDescription());
             if (solver.getCodeFile() != null && solver.getCodeFile().length > 0) {
                 // zip up directory
-                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(solver.getCodeFile());
+                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStreamAutoBasePath(solver.getCodeFile());
                 ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             } else {
                 ps.setNull(3, Types.BLOB);
@@ -115,7 +115,7 @@ public class SolverDAO {
             if (solver.getCodeFile() != null) { // if code is null, don't update the code (at the moment code can't be deleted)
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryCode);
                 // zip up directory
-                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(solver.getCodeFile());
+                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStreamAutoBasePath(solver.getCodeFile());
                 ps.setBinaryStream(1, new ByteArrayInputStream(zipped.toByteArray()));
                 ps.setInt(2, solver.getId());
                 ps.executeUpdate();
@@ -676,5 +676,16 @@ public class SolverDAO {
             map.put(s.getId(), solverList);
         }
         return map;
+    }
+
+    public static InputStream getZippedCodeFile(Solver s) throws SQLException {
+        final String query = "SELECT code FROM " + table + " WHERE idSolver=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, s.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getBinaryStream("code");
+        }
+        return null;
     }
 }

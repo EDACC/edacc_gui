@@ -31,7 +31,7 @@
                   <Component id="lCaption" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="bCancel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="395" max="32767" attributes="0"/>
+                      <EmptySpace pref="412" max="32767" attributes="0"/>
                       <Component id="bAddBinary" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
