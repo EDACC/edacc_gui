@@ -40,7 +40,7 @@ public class Main {
             if (expId != null && e.getExperimentId() != expId) {
                 continue;
             }
-            if (e.getResultCode().getResultCode() == SAT || e.getResultCode().getResultCode() == UNSAT) {
+            if (e.getResultCode().isCorrect()) {
                 res += e.getResultTime();
                 count++;
             }
@@ -58,7 +58,7 @@ public class Main {
             if (expId != null && e.getExperimentId() != expId) {
                 continue;
             }
-            if (e.getResultCode().getResultCode() == SAT || e.getResultCode().getResultCode() == UNSAT) {
+            if (e.getResultCode().isCorrect()) {
                 if (res == null || res > e.getResultTime()) {
                     res = e.getResultTime();
                 }
@@ -73,7 +73,7 @@ public class Main {
             if (expId != null && e.getExperimentId() != expId) {
                 continue;
             }
-            if (e.getResultCode().getResultCode() == SAT || e.getResultCode().getResultCode() == UNSAT) {
+            if (e.getResultCode().isCorrect()) {
                 resultTimes.add(e.getResultTime());
             } else {
                 if (e.getCPUTimeLimit() > 0) {

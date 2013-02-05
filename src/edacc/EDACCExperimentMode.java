@@ -706,6 +706,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         menuKillSoft = new javax.swing.JMenuItem();
         menuKillHard = new javax.swing.JMenuItem();
+        menuSetWaitTime = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         menuRemoveDeadClients = new javax.swing.JMenuItem();
         popupInstanceClassTree = new javax.swing.JPopupMenu();
@@ -856,6 +857,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
         popupTblClients.add(menuKillHard);
+
+        menuSetWaitTime.setText(resourceMap.getString("menuSetWaitTime.text")); // NOI18N
+        menuSetWaitTime.setName("menuSetWaitTime"); // NOI18N
+        menuSetWaitTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSetWaitTimeActionPerformed(evt);
+            }
+        });
+        popupTblClients.add(menuSetWaitTime);
 
         jSeparator2.setName("jSeparator2"); // NOI18N
         popupTblClients.add(jSeparator2);
@@ -1184,7 +1194,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
         );
 
         btnConfigScenarioSave.setText(resourceMap.getString("btnConfigScenarioSave.text")); // NOI18N
@@ -1414,7 +1424,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addComponent(lblSolverFilterStatus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1574,7 +1584,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
         );
 
         jSplitPane2.setLeftComponent(jPanel4);
@@ -3645,6 +3655,32 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableExperimentsWasEditing = false;
     }//GEN-LAST:event_tableExperimentsKeyPressed
 
+private void menuSetWaitTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSetWaitTimeActionPerformed
+        ArrayList<Client> clients = getSelectedClients();
+        if (clients.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "You have to select some clients.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            String wait_time_str = JOptionPane.showInputDialog("New wait time?");
+            try {
+                int wait_time = Integer.parseInt(wait_time_str);
+                if (wait_time < 0)
+                    throw new NumberFormatException();
+                try {
+                    String message = "wait_time " + wait_time;
+                    for (Client c : clients) {
+                        ClientDAO.sendMessage(c, message);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "The wait time has to be a number and must be greater zero.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+}//GEN-LAST:event_menuSetWaitTimeActionPerformed
+
     /**
      * Stops the jobs timer.
      */
@@ -3901,6 +3937,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JMenuItem menuRemoveDeadClients;
     private javax.swing.JMenuItem menuResetJobs;
     private javax.swing.JMenuItem menuSendMessage;
+    private javax.swing.JMenuItem menuSetWaitTime;
     private javax.swing.JScrollPane panelAnalysis;
     private javax.swing.JPanel panelChooseInstances;
     private javax.swing.JPanel panelChooseSolver;
