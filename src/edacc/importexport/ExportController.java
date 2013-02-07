@@ -103,13 +103,13 @@ public class ExportController implements ImportExportController {
         return depInstances;
     }
 
-    public void export(Tasks task, File file, List<Experiment> experiments, List<Solver> solvers, List<Instance> instances, List<Verifier> verifiers) throws FileNotFoundException, IOException, SQLException, JAXBException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+    public void export(Tasks task, File file, List<Experiment> experiments, List<Solver> solvers, List<Instance> instances, List<Verifier> verifiers, boolean exportInstanceBinaries) throws FileNotFoundException, IOException, SQLException, JAXBException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             ZipOutputStream os = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
             SolverDAO.exportSolvers(task, os, solvers);
-            InstanceDAO.exportInstances(task, os, instances);
+            InstanceDAO.exportInstances(task, os, instances, exportInstanceBinaries);
             ExperimentDAO.exportExperiments(task, os, experiments);
             VerifierDAO.exportVerifiers(task, os, verifiers);
             os.close();
