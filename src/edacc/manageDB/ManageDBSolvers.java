@@ -657,6 +657,8 @@ public class ManageDBSolvers implements Observer {
         zos.putNextEntry(newEntry);
 
         ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(s);
+        if (graph == null)
+            return;
         InputStream stream = ParameterGraphDAO.getParameterGraphXMLStream(graph);
         byte[] buf = new byte[2048];
         int len;
