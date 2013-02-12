@@ -572,7 +572,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
             
             @Override
             public void run() {
-                ex.printStackTrace();
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while loading data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -697,6 +697,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
             final ExportController c = (ExportController) controller;
             
             String filename = ((ExportSummaryPanel) panelSummary).getExportFilename();
+            final boolean exportInstanceBinaries = ((ExportSummaryPanel) panelSummary).exportInstanceBinaries();
             if (filename.equals("")) {
                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Filename cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -717,7 +718,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
                 @Override
                 public void run(Tasks task) {
                     try {
-                        c.export(task, file, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances(), verifierTableModel.getSelectedVerifiers());
+                        c.export(task, file, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances(), verifierTableModel.getSelectedVerifiers(), exportInstanceBinaries);
                         SwingUtilities.invokeLater(new Runnable() {
                             
                             @Override
