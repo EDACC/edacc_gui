@@ -436,7 +436,8 @@ public class InstanceDAO {
 
             res.add(i);
         }
-        InstanceHasPropertyDAO.assign(res);
+        //InstanceHasPropertyDAO.assign(res);
+        //InstanceHasPropertyDAO.init();
         rs.close();
         st.close();
         return res;

@@ -249,6 +249,36 @@ public class PropertyDAO {
         save(toRemove);
     }
 
+    private static Property getPropertyFromResultSet(ResultSet rs) throws SQLException, IOException {
+        Property res = new Property();
+
+        int id = rs.getInt("idProperty");
+        res.setId(id);
+        res.setName(rs.getString("name"));
+        res.setDescription(rs.getString("description"));
+        res.setType(rs.getInt("propertyType"));
+        res.setPropertySource(rs.getInt("propertySource"));
+        if (!res.getPropertySource().equals(PropertySource.Parameter)) {
+            res.setRegularExpression(getRegularExpressions(id));
+            res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString("propertyValueType")));
+            res.setMultiple(rs.getBoolean("multipleOccourence"));
+            if (res.getRegularExpression().isEmpty()) {
+                res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt("idComputationMethod")));
+            } else {
+                res.setComputationMethod(null);
+            }
+            res.setComputationMethodParameters(rs.getString("computationMethodParameters"));
+        } else {
+            res.setRegularExpression(new Vector<String>());
+            res.setValueType(null);
+            res.setMultiple(false);
+            res.setComputationMethod(null);
+            res.setComputationMethodParameters("");
+        }
+        res.setIsDefault(rs.getBoolean("isDefault"));
+        return res;
+    }
+
     /**
      * 
      * @return all Property objects with the PropertyType InstanceProperty
@@ -262,10 +292,19 @@ public class PropertyDAO {
             PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         Vector<Property> res = new Vector<Property>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idProperty FROM " + table + " WHERE PropertyType=0;");
+                "SELECT idProperty, name, description, propertyType, propertySource ,propertyValueType, multipleOccourence, idComputationMethod, "
+                + "computationMethodParameters, isDefault FROM " + table + " WHERE PropertyType=0;");
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-            res.add(PropertyDAO.getById(rs.getInt("idProperty")));
+            Property p = cache.getCached(rs.getInt("idProperty"));
+            if (p != null) {
+                res.add(p);
+            } else {
+                p = getPropertyFromResultSet(rs);
+                p.setSaved();
+                cache.cache(p);
+                res.add(p);
+            }
         }
         rs.close();
         ps.close();
@@ -384,7 +423,6 @@ public class PropertyDAO {
     }
 
     public static void init() throws SQLException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, PropertyNotInDBException {
-        InstanceHasPropertyDAO.init();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idProperty, name, description, propertyType, propertySource ,propertyValueType, multipleOccourence, idComputationMethod, "
                 + "computationMethodParameters, isDefault FROM " + table);
@@ -415,10 +453,10 @@ public class PropertyDAO {
             }
             res.setIsDefault(rs.getBoolean(10));
             res.setSaved();
-            cache.cache(res);
-            return;
+            cache.cache(res);          
+            //return;
         }
-
+        InstanceHasPropertyDAO.init();
     }
 
     /**
@@ -451,7 +489,8 @@ public class PropertyDAO {
             return;
         }
 
-        Boolean hasMD5 = false;;
+        Boolean hasMD5 = false;
+        ;
         if (fstLine.get(1).equals("md5") || fstLine.get(1).equals("MD5") || fstLine.get(1).equals("Md5")) {
             hasMD5 = true;
         }
@@ -459,7 +498,7 @@ public class PropertyDAO {
         //  To reduces the connection requests to the Databaseconnector during the creation an save Process of InstanceHasProperty Objects
         PreparedStatement psNew = DatabaseConnector.getInstance().getConn().prepareStatement(InstanceHasPropertyDAO.getInsertQuery(), PreparedStatement.RETURN_GENERATED_KEYS);
         PreparedStatement psMod = DatabaseConnector.getInstance().getConn().prepareStatement(InstanceHasPropertyDAO.getUpdateQuery());
-       
+
         String line = br.readLine();
 
         while (line != null) {
