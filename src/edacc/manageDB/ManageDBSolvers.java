@@ -92,7 +92,7 @@ public class ManageDBSolvers implements Observer {
     public void loadSolvers() throws NoConnectionToDBException, SQLException {
         solverTableModel.clear();
         SolverDAO.clearCache();
-        for (Solver s : SolverDAO.getAll()) {
+        for (Solver s : SolverDAO.getAllInit()) {
             solverTableModel.addSolver(s);
         }
     }

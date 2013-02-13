@@ -24,6 +24,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -248,6 +249,38 @@ public class SolverDAO {
         rs.close();
         return res;
     }
+
+    public static LinkedList<Solver> getAllInit() throws SQLException {
+        // First load all SolverBinaries
+        Vector<SolverBinaries> bins = SolverBinariesDAO.getAll();
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT idSolver, name, description, authors, version FROM " + table);
+        LinkedList<Solver> res = new LinkedList<Solver>();
+        while (rs.next()) {
+            Solver c = cache.getCached(rs.getInt("idSolver"));
+            if (c != null) {
+                res.add(c);
+            } else {
+                Solver i = new Solver();
+                i.setId(rs.getInt("idSolver"));
+                i.setName(rs.getString("name"));
+                i.setDescription(rs.getString("description"));
+                i.setAuthor(rs.getString("authors"));
+                i.setVersion(rs.getString("version"));
+                i.setSolverBinaries(new Vector<SolverBinaries>());
+                for (SolverBinaries b : bins)
+                    if (b.getIdSolver() == i.getId())
+                        i.addSolverBinary(b);
+                i.setCostBinaries(CostDAO.getCostBinariesForSolver(i));
+                i.setSaved();
+                cache.cache(i);
+                res.add(i);
+            }
+        }
+        rs.close();
+        return res;
+    }
+
 
     /**
      * Tests if a solver is already in DB (by MD5) and returns the cached object or
