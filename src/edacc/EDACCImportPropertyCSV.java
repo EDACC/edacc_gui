@@ -33,11 +33,13 @@ import javax.swing.table.TableRowSorter;
 public class EDACCImportPropertyCSV extends javax.swing.JDialog implements TaskEvents {
 
     ImportPropertyCSVController controller;
-
+    EDACCExperimentMode experimentMode;
+    
     /** Creates new form EDACCImportPropertyCSV */
-    public EDACCImportPropertyCSV(java.awt.Frame parent, boolean modal) {
+    public EDACCImportPropertyCSV(java.awt.Frame parent, EDACCExperimentMode experimentMode, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.experimentMode = experimentMode;
     }
 
     /** This method is called from within the constructor to
@@ -265,28 +267,9 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog implements TaskE
         controller.ManageProperties();
     }//GEN-LAST:event_jBtnManagePropertiesActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-                EDACCImportPropertyCSV dialog = new EDACCImportPropertyCSV(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
-
     public void initialize(File csvFile) {
         try {
-            controller = new ImportPropertyCSVController(this, csvFile);
+            controller = new ImportPropertyCSVController(experimentMode, this, csvFile);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(EDACCImportPropertyCSV.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

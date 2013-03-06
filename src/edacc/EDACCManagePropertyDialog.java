@@ -58,11 +58,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private EDACCManageComputationMethodDialog computationMethodDialog;
     private ManagePropertyDialogSourceListener sourceListener;
     private ManagePropertyDialogTypeListener typeListener;
-
+    private EDACCExperimentMode experimentMode;
+    
     /** Creates new form EDACCManagePropertyDialog */
-    public EDACCManagePropertyDialog(java.awt.Frame parent, boolean modal) {
+    public EDACCManagePropertyDialog(java.awt.Frame parent, EDACCExperimentMode experimentMode, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.experimentMode = experimentMode;
+        
         controller = new ManagePropertyController(this, panelManageProperty, tableProperty);
 
         buttonGroup1.add(radioBtnComputationMethod);
@@ -568,6 +571,9 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+        
+        // update job browser table in experiment mode:
+        experimentMode.updateJobBrowserProperties();
     }//GEN-LAST:event_buttonRemovePropertyActionPerformed
 
     private void buttonSavePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSavePropertyActionPerformed
@@ -641,6 +647,9 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+        
+        // update job browser table in experiment mode:
+        experimentMode.updateJobBrowserProperties();
     }//GEN-LAST:event_buttonSavePropertyActionPerformed
 
     private void buttonNewComputationMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewComputationMethodActionPerformed
@@ -690,26 +699,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         }
         File[] files = jFileChooser1.getSelectedFiles();
         controller.importProperty(files);
+        
+        // update job browser table in experiment mode:
+        experimentMode.updateJobBrowserProperties();
     }//GEN-LAST:event_buttonImportPropertyActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-                EDACCManagePropertyDialog dialog = new EDACCManagePropertyDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonDone;
     private javax.swing.JButton buttonExportProperty;

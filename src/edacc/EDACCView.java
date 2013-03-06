@@ -448,7 +448,7 @@ public class EDACCView extends FrameView implements Observer {
     private void ManagePropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ManagePropertyMenuItemActionPerformed
         if (manageSolverProperties == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, true);
+            manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, experimentMode, true);
             manageSolverProperties.setLocationRelativeTo(mainFrame);
         }
         manageSolverProperties.initialize();
@@ -616,7 +616,7 @@ public class EDACCView extends FrameView implements Observer {
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCImportPropertyCSV importCSVProps = new EDACCImportPropertyCSV(mainFrame, true);
+            EDACCImportPropertyCSV importCSVProps = new EDACCImportPropertyCSV(mainFrame, experimentMode, true);
             importCSVProps.setLocationRelativeTo(mainFrame);
 
             importCSVProps.initialize(csvFile);
