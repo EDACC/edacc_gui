@@ -2979,9 +2979,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
-        jobsTableModel.updateProperties();
-        //    jobsColumnSelector = new TableColumnSelector(tableJobs);
-        //    resetJobsColumnVisibility();
+        if (jobsTableModel.updateProperties()) {
+            jobsColumnSelector = new TableColumnSelector(tableJobs);
+            resetJobsColumnVisibility();
+        }
+        
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
