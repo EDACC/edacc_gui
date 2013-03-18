@@ -434,6 +434,7 @@ public class ManageDBSolvers implements Observer {
                         @Override
                         public void run() {
                             JOptionPane.showMessageDialog(gui, "An error occured while exporting solver binaries: \n" + e.getMessage(), "Error while exporting solver binaries", JOptionPane.ERROR_MESSAGE);
+                            e.printStackTrace();
                         }
                     });
                 }
@@ -615,7 +616,17 @@ public class ManageDBSolvers implements Observer {
         ZipEntry newEntry = new ZipEntry(s.getName() + "/ReadMe.txt");
         zos.putNextEntry(newEntry);
         PrintWriter pout = new PrintWriter(zos);
-        pout.println("This is the ReadMe-File of the solver " + s.getName());
+        final String title = s.getName() + ((s.getVersion() != null && !s.getVersion().equals("")) ? " " + s.getVersion() : "");
+        pout.println(title);
+        for (int i = 0; i < title.length(); i++) {
+            pout.print("=");
+        }
+        pout.println();
+        if (s.getAuthors() != null && !s.getAuthors().equals("")) {
+            pout.println(" by " + s.getAuthors());
+        }
+        pout.println();
+        pout.println("This is the ReadMe-File of the solver " + s.getName() + ".");
         pout.println("It has been created automatically by EDACC.");
         pout.println();
 
@@ -623,32 +634,89 @@ public class ManageDBSolvers implements Observer {
         pout.println("==================");
         pout.println();
         pout.println("The solver has been compiled to the following binary "
-                + "versions which can be found in the subdirectory \"bin\".");
+                + "versions which can be found in the subdirectory \"bin/\".");
         pout.println("If the binary needs a specific run command (eg. java -jar), "
                 + "then this is mentioned in the following list.");
         pout.println("The start commands are relative to the path of the binary, eg. bin/myBinary/.");
         pout.println();
         for (SolverBinaries b : bins) {
-            pout.println("* " + b.getBinaryName() + ": ");
+            pout.println("* " + b.getBinaryName()
+                    + (b.getVersion() != null && !b.getVersion().equals("")
+                    ? "(" + b.getVersion() + ")"
+                    : "")
+                    + ": ");
             String runCommand = "";
-            if (b.getRunCommand() != null)
+            if (b.getRunCommand() != null) {
                 runCommand = b.getRunCommand();
+            }
             pout.println("\tStart command: " + runCommand + " ." + b.getRunPath());
         }
         pout.println();
         pout.println("2. Parameters");
         pout.println("=============");
         pout.println();
-        pout.println("The solver binaries can be executed with the following commands: ");
+        pout.println("The solver binaries can be executed with the following parameters: ");
         pout.println();
-        pout.println("Order\tName\tPrefix\tboolean\tdefault value\tmandatory\tspace\t");
-        Collections.sort(params, new ParameterOrderComparator()); // sort params list by order
-        for (Parameter p : params) {
-            pout.println(p.getOrder() + "\t" + p.getName() + "\t" + p.getPrefix() + "\t"
-                    + (p.getHasValue() ? "X" : "") + "\t" + p.getDefaultValue()
-                    + "\t" + (p.isMandatory() ? "X" : "") + "\t" + (p.getSpace() ? "X" : ""));
+
+        // calc parameter table
+        // columns[<column>][<line>]
+        String[][] columns = new String[7][params.size() + 1];
+        final int ORDER = 0;
+        final int NAME = 1;
+        final int PREFIX = 2;
+        final int DEF_VAL = 3;
+        final int BOOLEAN = 4;
+        final int MANDATORY = 5;
+        final int SPACE = 6;
+
+        //init arrays (first line of table
+        columns[ORDER][0] = "Order";
+        columns[NAME][0] = "Name";
+        columns[PREFIX][0] = "Prefix";
+        columns[DEF_VAL][0] = "Default Value";
+        columns[BOOLEAN][0] = "Boolean";
+        columns[MANDATORY][0] = "Mandatory";
+        columns[SPACE][0] = "Space";
+
+        // initialize maxlenghts to column heading
+        int[] max = new int[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            max[i] = columns[i][0].length();
         }
+
+        // find maxlength of text in every column and fill columns with values
+        Collections.sort(params, new ParameterOrderComparator()); // sort params list by order
+        for (int i = 0; i < params.size(); i++) {
+            Parameter p = params.get(i);
+            columns[ORDER][i + 1] = Integer.toString(p.getOrder());
+            columns[NAME][i + 1] = p.getName() == null ? "" : p.getName();
+            columns[PREFIX][i + 1] = p.getPrefix() == null ? "" : p.getPrefix();
+            columns[DEF_VAL][i + 1] = p.getDefaultValue() == null ? "" : p.getDefaultValue();
+            columns[BOOLEAN][i + 1] = !p.getHasValue() ? "X" : "";
+            columns[MANDATORY][i + 1] = p.isMandatory() ? "X" : "";
+            columns[SPACE][i + 1] = p.getSpace() ? "X" : "";
+
+            for (int j = 0; j < columns.length; j++) {
+                if (max[j] < columns[j][i + 1].length()) {
+                    max[j] = columns[j][i + 1].length();
+                }
+            }
+        }
+
+        for (int j = 0; j <= params.size(); j++) {
+            pout.print("|");
+            for (int i = 0; i < columns.length; i++) {
+                pout.print(columns[i][j]);
+                for (int k = columns[i][j].length(); k < max[i]; k++) {
+                    pout.print(" ");
+                }
+                pout.print("|");
+            }
+            pout.println();
+        }
+
         pout.flush();
+
         zos.closeEntry();
     }
 
@@ -657,30 +725,52 @@ public class ManageDBSolvers implements Observer {
         zos.putNextEntry(newEntry);
 
         ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(s);
-        if (graph == null)
+
+
+        if (graph == null) {
             return;
+        }
         InputStream stream = ParameterGraphDAO.getParameterGraphXMLStream(graph);
+
+
         byte[] buf = new byte[2048];
+
+
         int len;
+
+
         while ((len = stream.read(buf)) > 0) {
             zos.write(buf, 0, len);
+
+
         }
         zos.closeEntry();
         stream.close();
-    }
 
+
+    }
 
     @Override
     public void update(Observable o, Object arg) {
         solverTableModel.clear();
+
+
     }
 
     public void removeSolverBinaries(Solver s) throws SQLException {
         SolverBinariesDAO.removeBinariesOfSolver(s);
+
+
     }
 
     void selectSolverBinary(boolean selected) {
         gui.enableSolverBinaryButtons(selected);
+
+
+
+
+
+
     }
 
     private class ParameterOrderComparator implements Comparator<Parameter> {
@@ -689,6 +779,5 @@ public class ManageDBSolvers implements Observer {
         public int compare(Parameter p1, Parameter p2) {
             return ((Integer) p1.getOrder()).compareTo(p2.getOrder());
         }
-        
     }
 }

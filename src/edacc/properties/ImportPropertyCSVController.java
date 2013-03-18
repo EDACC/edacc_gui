@@ -5,6 +5,7 @@
 package edacc.properties;
 
 import edacc.EDACCApp;
+import edacc.EDACCExperimentMode;
 import edacc.EDACCImportPropertyCSV;
 import edacc.EDACCManagePropertyDialog;
 import edacc.model.ComputationMethodDoesNotExistException;
@@ -39,8 +40,9 @@ public class ImportPropertyCSVController {
     File csvFile;
     SystemPropertyTableModel sysPropTableModel;
     CSVPropertyTableModel csvPropTableModel;
-
-    public ImportPropertyCSVController(EDACCImportPropertyCSV view, File csvFile) throws FileNotFoundException, IOException {
+    EDACCExperimentMode experimentMode;
+    public ImportPropertyCSVController(EDACCExperimentMode experimentMode, EDACCImportPropertyCSV view, File csvFile) throws FileNotFoundException, IOException {
+        this.experimentMode = experimentMode;
         this.view = view;
         this.csvFile = csvFile;
         createSysPropModel();
@@ -128,7 +130,7 @@ public class ImportPropertyCSVController {
 
     public void ManageProperties() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCManagePropertyDialog manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, true);
+        EDACCManagePropertyDialog manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, experimentMode, true);
         manageSolverProperties.setLocationRelativeTo(mainFrame);
         manageSolverProperties.initialize();
         manageSolverProperties.setVisible(true);

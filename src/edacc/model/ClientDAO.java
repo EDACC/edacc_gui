@@ -86,13 +86,13 @@ public class ClientDAO {
             rs.close();
             st.close();
         }
-        for (Client c : cache.values()) {
-            clients.add(c);
-        }
         for (Client c : deletedClients) {
             c.setDeleted();
             c.notifyObservers();
             cache.remove(c);
+        }
+        for (Client c : cache.values()) {
+            clients.add(c);
         }
 
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT Experiment_idExperiment, Client_idClient, numCores FROM Experiment_has_Client WHERE numCores > 0");

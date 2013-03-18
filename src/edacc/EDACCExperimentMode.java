@@ -2228,10 +2228,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     jobsTableModel.setJobs(null);
                 } catch (SQLException ex) {
                 }
-                if (jobsTableModel.updateProperties()) {
-                    jobsColumnSelector = new TableColumnSelector(tableJobs);
-                    resetJobsColumnVisibility();
-                }
+                updateJobBrowserProperties();
 
                 // first draw the results browser, then load the jobs (SwingUtilites)
                 SwingUtilities.invokeLater(new Runnable() {
@@ -2978,10 +2975,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
+    
+    public void updateJobBrowserProperties() {
+        if (jobsTableModel.updateProperties()) {
+            jobsColumnSelector = new TableColumnSelector(tableJobs);
+            resetJobsColumnVisibility();
+        }
+    }
+    
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
-        jobsTableModel.updateProperties();
-        //    jobsColumnSelector = new TableColumnSelector(tableJobs);
-        //    resetJobsColumnVisibility();
+        updateJobBrowserProperties();
+        
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
