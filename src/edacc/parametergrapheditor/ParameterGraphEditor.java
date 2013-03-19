@@ -598,7 +598,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
     private void btnLayoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLayoutActionPerformed
         mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
-        layout.setInterRankCellSpacing(25);
+        layout.setInterRankCellSpacing(40);
         // layout.setFixRoots(true);
         Object cell = graph.getSelectionCell();
 
