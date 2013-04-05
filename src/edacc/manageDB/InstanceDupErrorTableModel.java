@@ -9,6 +9,8 @@ import edacc.model.InstanceDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import javax.swing.table.DefaultTableModel;
 
@@ -215,7 +217,8 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      * @param add The instance object to check.
      */
     public void checkNewAdded(Instance add) {
-        Set<Instance> keySet = backRelation.keySet();
+        List<Instance> keySet = new LinkedList<Instance>();
+        keySet.addAll(backRelation.keySet());
         Boolean added = false;
         for (Instance inst : keySet) {
             if (inst.getName().equals(add.getName()) || inst.getMd5().equals(add.getMd5())) {
