@@ -469,7 +469,7 @@ public class PropertyDAO {
             Instance tmp;
             int count = 0;
             if (hasMD5) {
-                tmp = InstanceDAO.getByMd5AndName(tmpLine.get(0), tmpLine.get(1));
+                tmp = InstanceDAO.getByMd5(tmpLine.get(1));
                 count = 2;
             } else {
                 tmp = InstanceDAO.getByName(tmpLine.get(0));
