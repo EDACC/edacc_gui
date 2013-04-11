@@ -20,6 +20,8 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `verified` TINYINT(1) NULL ,
   `accepted_terms` TINYINT(1) NULL ,
   `admin` TINYINT(1) NULL ,
+  `country` VARCHAR(255) NOT NULL ,
+  `affiliation_type` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`idUser`) )
 ENGINE = InnoDB;
 
@@ -724,6 +726,8 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResultsOutput` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
+ALTER TABLE ExperimentResultsOutput ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
 
 
 -- -----------------------------------------------------
