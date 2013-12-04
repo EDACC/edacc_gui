@@ -295,7 +295,7 @@ CREATE  TABLE IF NOT EXISTS `gridQueue` (
   `cacheSize` INT NULL ,
   `cpuflags` VARCHAR(1024) NULL ,
   `memory` BIGINT NULL ,
-  `cpuinfo` VARCHAR(4096) NULL ,
+  `cpuinfo` LONGTEXT NULL ,
   `meminfo` VARCHAR(4096) NULL ,
   PRIMARY KEY (`idgridQueue`) )
 ENGINE = InnoDB;
@@ -317,7 +317,7 @@ CREATE  TABLE IF NOT EXISTS `Client` (
   `cpuflags` VARCHAR(1024) NULL ,
   `memory` BIGINT NULL ,
   `memoryFree` BIGINT NULL ,
-  `cpuinfo` VARCHAR(4096) NULL ,
+  `cpuinfo` LONGTEXT NULL ,
   `meminfo` VARCHAR(4096) NULL ,
   `message` VARCHAR(4096) NULL ,
   `gridQueue_idgridQueue` INT NOT NULL ,
