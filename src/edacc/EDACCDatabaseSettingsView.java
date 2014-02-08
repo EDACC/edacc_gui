@@ -86,6 +86,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                 this.txtPassword.setText(map.get("password" + ext));
             }
         }
+        txtSessionName.setText(sessionName);
     }
     
     private void saveDatabaseSettings(String sessionName) throws IOException {
