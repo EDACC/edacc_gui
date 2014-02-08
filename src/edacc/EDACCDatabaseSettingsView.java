@@ -15,14 +15,17 @@ import edacc.model.Tasks;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.jdesktop.application.ApplicationContext;
-import org.jdesktop.application.LocalStorage;
 
 /**
  *
@@ -38,43 +41,107 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         initComponents();
         //btnConnect.requestFocus();
         getRootPane().setDefaultButton(btnConnect);
-
-        ApplicationContext ctxt = EDACCApp.getApplication().getContext();
-        LocalStorage ls = ctxt.getLocalStorage();
         try {
-            Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
-            if (map != null) {
-                if (map.containsKey("hostname")) {
-                    this.txtHostname.setText(map.get("hostname"));
-                }
-                if (map.containsKey("database")) {
-                    this.txtDatabase.setText(map.get("database"));
-                }
-                if (map.containsKey("port")) {
-                    this.txtPort.setText(map.get("port"));
-                }
-                if (map.containsKey("username")) {
-                    this.txtUsername.setText(map.get("username"));
-                }
-                if (map.containsKey("max_connections")) {
-                    this.txtMaxConnections.setText(map.get("max_connections"));
-                }
-                if (map.containsKey("secured_connection")) {
-                    this.chkUseSSL.setSelected(map.get("secured_connection").equalsIgnoreCase("true"));
-                }
-                if (map.containsKey("use_compression")) {
-                    this.chkCompress.setSelected(map.get("use_compression").equalsIgnoreCase("true"));
-                }
-                if (map.containsKey("save_password")) {
-                    this.chkSavePassword.setSelected(map.get("save_password").equalsIgnoreCase("true"));
-                }
-                if (this.chkSavePassword.isSelected() && map.containsKey("password")) {
-                    this.txtPassword.setText(map.get("password"));
-                }
-            }
+            loadDatabaseSettings(null);
+            reloadSessionNames();
+            txtSessionName.setText("");
         } catch (IOException ex) {
             Logger.getLogger(EDACCDatabaseSettingsView.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private void loadDatabaseSettings(String sessionName) throws IOException {
+        String ext = "";
+        if (sessionName != null) {
+            ext = "[" + sessionName + "]";
+        }
+        ApplicationContext ctxt = EDACCApp.getApplication().getContext();
+        Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        if (map != null) {
+            if (map.containsKey("hostname" + ext)) {
+                this.txtHostname.setText(map.get("hostname" + ext));
+            }
+            if (map.containsKey("database" + ext)) {
+                this.txtDatabase.setText(map.get("database" + ext));
+            }
+            if (map.containsKey("port" + ext)) {
+                this.txtPort.setText(map.get("port"));
+            }
+            if (map.containsKey("username" + ext)) {
+                this.txtUsername.setText(map.get("username" + ext));
+            }
+            if (map.containsKey("max_connections" + ext)) {
+                this.txtMaxConnections.setText(map.get("max_connections"));
+            }
+            if (map.containsKey("secured_connection" + ext)) {
+                this.chkUseSSL.setSelected(map.get("secured_connection" + ext).equalsIgnoreCase("true"));
+            }
+            if (map.containsKey("use_compression" + ext)) {
+                this.chkCompress.setSelected(map.get("use_compression" + ext).equalsIgnoreCase("true"));
+            }
+            if (map.containsKey("save_password" + ext)) {
+                this.chkSavePassword.setSelected(map.get("save_password" + ext).equalsIgnoreCase("true"));
+            }
+            if (this.chkSavePassword.isSelected() && map.containsKey("password" + ext)) {
+                this.txtPassword.setText(map.get("password" + ext));
+            }
+        }
+    }
+    
+    private void saveDatabaseSettings(String sessionName) throws IOException {
+        String ext = "";
+        if (sessionName != null) {
+            ext = "[" + sessionName + "]";
+        }
+        ApplicationContext ctxt = EDACCApp.getApplication().getContext();
+        Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        map.put("hostname" + ext, txtHostname.getText());
+        map.put("database" + ext, txtDatabase.getText());
+        map.put("port" + ext, txtPort.getText());
+        map.put("username" + ext, txtUsername.getText());
+        map.put("max_connections" + ext, txtMaxConnections.getText());
+        map.put("secured_connection" + ext, chkUseSSL.isSelected() ? "true" : "false");
+        map.put("use_compression" + ext, chkCompress.isSelected() ? "true" : "false");
+        map.put("save_password" + ext, chkSavePassword.isSelected() ? "true" : "false");
+        if (chkSavePassword.isSelected()) {
+            map.put("password" + ext, txtPassword.getText());
+        } else {
+            map.put("password" + ext, "");
+        }
+        ctxt.getLocalStorage().save(map, connection_settings_filename);
+    }
+    
+    private void removeSavedDatabaseSession(String sessionName) throws IOException {
+        String ext = "";
+        if (sessionName != null) {
+            ext = "[" + sessionName + "]";
+        }
+        ApplicationContext ctxt = EDACCApp.getApplication().getContext();
+        Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        map.remove("hostname" + ext);
+        map.remove("database" + ext);
+        map.remove("port" + ext);
+        map.remove("username" + ext);
+        map.remove("max_connections" + ext);
+        map.remove("secured_connection" + ext);
+        map.remove("use_compression" + ext);
+        map.remove("save_password" + ext);
+        map.remove("password" + ext);
+        ctxt.getLocalStorage().save(map, connection_settings_filename);
+    }
+    
+    private void reloadSessionNames() throws IOException {
+        ApplicationContext ctxt = EDACCApp.getApplication().getContext();
+        Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        List<String> sessions = new LinkedList<String>();
+        for (String key : map.keySet()) {
+            if (key.startsWith("hostname") && key.length() >= 10) {
+                String name = key.substring(9, key.length()-1);
+                sessions.add(name);
+            }
+        }
+        Collections.sort(sessions);
+        listSavedSessions.setListData(sessions.toArray());
     }
 
     /** This method is called from within the constructor to
@@ -106,6 +173,14 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         txtMaxConnections = new javax.swing.JTextField();
         chkSavePassword = new javax.swing.JCheckBox();
+        btnSaveSession = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        txtSessionName = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listSavedSessions = new javax.swing.JList();
+        btnLoadSession = new javax.swing.JButton();
+        btnRemoveSession = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCDatabaseSettingsView.class);
@@ -143,7 +218,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
         jPanel1.setName("jPanel1"); // NOI18N
 
         txtPassword.setText(resourceMap.getString("txtPassword.text")); // NOI18N
@@ -248,45 +323,68 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         chkSavePassword.setText(resourceMap.getString("chkSavePassword.text")); // NOI18N
         chkSavePassword.setName("chkSavePassword"); // NOI18N
 
+        btnSaveSession.setText(resourceMap.getString("btnSaveSession.text")); // NOI18N
+        btnSaveSession.setName("btnSaveSession"); // NOI18N
+        btnSaveSession.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveSessionActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
+        txtSessionName.setText(resourceMap.getString("txtSessionName.text")); // NOI18N
+        txtSessionName.setName("txtSessionName"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblHostname, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                            .addComponent(lblDatabase, 0, 0, Short.MAX_VALUE)
-                            .addComponent(lblUsername, 0, 0, Short.MAX_VALUE)
-                            .addComponent(lblPassword, 0, 0, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(26, 26, 26))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblPassword1, 0, 0, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(61, 61, 61)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkSavePassword)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(txtHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(32, 32, 32)
-                            .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-                            .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(txtUsername)
-                        .addComponent(txtPassword)
-                        .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
-                        .addComponent(chkCompress)
-                        .addComponent(chkUseSSL)
-                        .addComponent(txtMaxConnections)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblHostname, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                                .addComponent(lblDatabase, 0, 0, Short.MAX_VALUE)
+                                .addComponent(lblUsername, 0, 0, Short.MAX_VALUE)
+                                .addComponent(lblPassword, 0, 0, Short.MAX_VALUE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel2)
+                            .addGap(26, 26, 26))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(lblPassword1, 0, 0, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel1)
+                            .addGap(61, 61, 61)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(42, 42, 42)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtSessionName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSaveSession, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(chkSavePassword)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32)
+                                .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                                .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtUsername)
+                            .addComponent(txtPassword)
+                            .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                            .addComponent(chkCompress)
+                            .addComponent(chkUseSSL)
+                            .addComponent(txtMaxConnections))))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -323,10 +421,68 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(chkCompress))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSaveSession)
+                    .addComponent(jLabel3)
+                    .addComponent(txtSessionName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {lblDatabase, lblHostname, lblPassword, lblUsername});
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
+        jPanel2.setName("jPanel2"); // NOI18N
+
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        listSavedSessions.setName("listSavedSessions"); // NOI18N
+        listSavedSessions.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listSavedSessionsMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(listSavedSessions);
+
+        btnLoadSession.setText(resourceMap.getString("btnLoadSession.text")); // NOI18N
+        btnLoadSession.setName("btnLoadSession"); // NOI18N
+        btnLoadSession.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadSessionActionPerformed(evt);
+            }
+        });
+
+        btnRemoveSession.setText(resourceMap.getString("btnRemoveSession.text")); // NOI18N
+        btnRemoveSession.setName("btnRemoveSession"); // NOI18N
+        btnRemoveSession.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveSessionActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(88, Short.MAX_VALUE)
+                .addComponent(btnRemoveSession)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnLoadSession, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+        );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnLoadSession, btnRemoveSession});
+
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLoadSession)
+                    .addComponent(btnRemoveSession)))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -335,10 +491,13 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 356, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 575, Short.MAX_VALUE)
                         .addComponent(btnConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -346,11 +505,13 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnConnect)
-                    .addComponent(btnCancel))
+                    .addComponent(btnCancel)
+                    .addComponent(btnConnect))
                 .addContainerGap())
         );
 
@@ -368,24 +529,8 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             @Override
             public void run(Tasks task) {
                 try {
-                    ApplicationContext ctxt = EDACCApp.getApplication().getContext();
-                    LocalStorage ls = ctxt.getLocalStorage();
-                    Map<String, String> map = new HashMap<String, String>();
                     try {
-                        map.put("hostname", txtHostname.getText());
-                        map.put("database", txtDatabase.getText());
-                        map.put("port", txtPort.getText());
-                        map.put("username", txtUsername.getText());
-                        map.put("max_connections", txtMaxConnections.getText());
-                        map.put("secured_connection", chkUseSSL.isSelected() ? "true" : "false");
-                        map.put("use_compression", chkCompress.isSelected() ? "true" : "false");
-                        map.put("save_password", chkSavePassword.isSelected() ? "true" : "false");
-                        if (chkSavePassword.isSelected()) {
-                            map.put("password", txtPassword.getText());
-                        } else {
-                            map.put("password", "");
-                        }
-                        ctxt.getLocalStorage().save(map, connection_settings_filename);
+                        saveDatabaseSettings(null);
                     } catch (IOException ex) {
                         // couldn't save connection settings, doesn't really matter
                         Logger.getLogger(EDACCDatabaseSettingsView.class.getName()).log(Level.SEVERE, null, ex);
@@ -626,26 +771,80 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtMaxConnectionsKeyPressed
+
+    private void listSavedSessionsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listSavedSessionsMouseClicked
+        if (evt.getClickCount() > 1) {
+            btnLoadSessionActionPerformed(null);
+            btnConnectActionPerformed(null);
+        }
+    }//GEN-LAST:event_listSavedSessionsMouseClicked
+
+    private void btnSaveSessionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveSessionActionPerformed
+        if (!txtSessionName.getText().equals("")) {
+            try {
+                saveDatabaseSettings(txtSessionName.getText());
+                reloadSessionNames();
+            } catch (IOException ex) {
+                Logger.getLogger(EDACCDatabaseSettingsView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnSaveSessionActionPerformed
+
+    private void btnLoadSessionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadSessionActionPerformed
+        if (listSavedSessions.getSelectedIndex() != -1) {
+            Object sel = listSavedSessions.getModel().getElementAt(listSavedSessions.getSelectedIndex());
+            if (sel instanceof String) {
+                try {
+                    loadDatabaseSettings((String) sel);
+                } catch (IOException ex) {
+                    Logger.getLogger(EDACCDatabaseSettingsView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnLoadSessionActionPerformed
+
+    private void btnRemoveSessionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveSessionActionPerformed
+        if (listSavedSessions.getSelectedIndex() != -1) {
+            Object sel = listSavedSessions.getModel().getElementAt(listSavedSessions.getSelectedIndex());
+            if (sel instanceof String) {
+                try {
+                    removeSavedDatabaseSession((String) sel);
+                    reloadSessionNames();
+                } catch (IOException ex) {
+                    Logger.getLogger(EDACCDatabaseSettingsView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnRemoveSessionActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnConnect;
+    private javax.swing.JButton btnLoadSession;
+    private javax.swing.JButton btnRemoveSession;
+    private javax.swing.JButton btnSaveSession;
     private javax.swing.JCheckBox chkCompress;
     private javax.swing.JCheckBox chkSavePassword;
     private javax.swing.JCheckBox chkUseSSL;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblDatabase;
     private javax.swing.JLabel lblHostname;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblPassword1;
     private javax.swing.JLabel lblPort;
     private javax.swing.JLabel lblUsername;
+    private javax.swing.JList listSavedSessions;
     private javax.swing.JTextField txtDatabase;
     private javax.swing.JTextField txtHostname;
     private javax.swing.JTextField txtMaxConnections;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtPort;
+    private javax.swing.JTextField txtSessionName;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }
