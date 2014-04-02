@@ -823,6 +823,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                     if (line.startsWith("#") || line.isEmpty()) continue;
                     
                     String param = line.split(" ")[0];
+                    Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.INFO, null, "Found paramter "+ param +"\n");
                     if (line.charAt(param.length() + 1) == '[') {
                         int endIx = line.indexOf(']', param.length() + 2);
                         String range = line.substring(param.length() + 2, endIx);
