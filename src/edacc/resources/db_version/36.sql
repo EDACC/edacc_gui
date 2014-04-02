@@ -1,0 +1,2 @@
+ALTER TABLE gridQueue MODIFY cpuinfo LONGTEXT;
+ALTER TABLE Client MODIFY cpuinfo LONGTEXT;
