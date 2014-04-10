@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Parameter implements Comparable<Parameter>, Serializable {
 	private String name;
 	private Domain domain;
+        private boolean conditioned;
 	
 	public Parameter() {
 		
@@ -16,6 +17,12 @@ public class Parameter implements Comparable<Parameter>, Serializable {
 	public Parameter(String name, Domain domain) {
 		this.name = name;
 		this.domain = domain;
+	}
+
+        public Parameter(String name, Domain domain, boolean cond) {
+		this.name = name;
+		this.domain = domain;
+                this.conditioned = cond;
 	}
 	
 	@Override
@@ -51,6 +58,13 @@ public class Parameter implements Comparable<Parameter>, Serializable {
 		this.name = name;
 	}
 
+        public void setConditioned (boolean cond){
+            this.conditioned = cond;
+        }
+
+        public boolean getConditioned (){
+            return this.conditioned;
+        }
 	public Domain getDomain() {
 		return domain;
 	}

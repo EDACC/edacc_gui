@@ -17,6 +17,7 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxMultiplicity;
 import edacc.EDACCApp;
+//import edacc.model.Parameter; //Todo generate the parameters from smac file
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterGraphDAO;
 import edacc.model.Solver;
@@ -701,6 +702,10 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             nodes.add(orNode);
             nodes.add(andNode);
         }
+        renderGraph(nodes, edges, startNode);
+    }
+
+    private void renderGraph(Set<Node> nodes, List<Edge> edges, AndNode startNode) {
         ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, startNode);
 
         graph.getModel().beginUpdate();
@@ -810,46 +815,314 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }//GEN-LAST:event_btnLoadFromFileActionPerformed
 
     private void btnImportSMACStyleParamsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportSMACStyleParamsActionPerformed
+        JOptionPane.showMessageDialog(ParameterGraphEditor.this, "Conditional parameters can be imported only when their parent is of categorical type! Please check the graph after import!", "SMAC Specification import", JOptionPane.INFORMATION_MESSAGE);
         JFileChooser fc = new JFileChooser();
+        int lineNr = 0;
         fc.showOpenDialog(this);
+        HashSet<String> childParams = new HashSet<String>();
+        HashSet<String> parentParams = new HashSet<String>();
+        StringBuilder message = new StringBuilder();
+        class Conditional {
+
+            HashSet<String> childrenParams;
+            ArrayList<String> condParamWithValues;
+
+            Conditional(String child, ArrayList<String> condparamv) {
+                this.childrenParams = new HashSet<String>();
+                this.childrenParams.add(child);
+                this.condParamWithValues = condparamv;
+
+            }
+
+            Conditional(ArrayList<String> condparamv) {
+                this.childrenParams = new HashSet<String>();
+                this.condParamWithValues = condparamv;
+
+            }
+
+            public void addChild(String child) {
+                this.childrenParams.add(child);
+            }
+
+            public HashSet<String> getChildren() {
+                return new HashSet<String>(this.childrenParams);
+            }
+
+            @Override
+            public String toString() {
+                return "Conditional{" + "condParamWithValues=" + condParamWithValues + " childrenParams=" + childrenParams + '}';
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj == null) {
+                    return false;
+                }
+                if (getClass() != obj.getClass()) {
+                    return false;
+                }
+                final Conditional other = (Conditional) obj;
+                if (this.condParamWithValues != other.condParamWithValues && (this.condParamWithValues == null || !this.condParamWithValues.equals(other.condParamWithValues))) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public int hashCode() {
+                int hash = 5;
+                hash = 71 * hash + (this.condParamWithValues != null ? this.condParamWithValues.hashCode() : 0);
+                return hash;
+            }
+        }
+        HashSet<Conditional> conditionalParams = new HashSet<Conditional>();
+        HashSet<String> allParamNames = new HashSet<String>();
         if (fc.getSelectedFile() != null) {
             try {
                 parameters = new HashSet<Parameter>();
-                
+                //System.out.println("Found Paramters:");
                 BufferedReader rdr = new BufferedReader(new InputStreamReader(new FileInputStream(fc.getSelectedFile()), "UTF-8"));
                 String line;
                 while ((line = rdr.readLine()) != null) {
-                    if (line.startsWith("Conditionals")) break;
-                    if (line.startsWith("#") || line.isEmpty()) continue;
-                    
-                    String param = line.split(" ")[0];
-                    Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.INFO, null, "Found paramter "+ param +"\n");
-                    if (line.charAt(param.length() + 1) == '[') {
-                        int endIx = line.indexOf(']', param.length() + 2);
-                        String range = line.substring(param.length() + 2, endIx);
-                        
-                        int endDefaultIx = line.indexOf(']', endIx + 1);
-                        boolean isInt = line.charAt(endDefaultIx + 1) == 'i';
-                        
+                    lineNr++;
+                    line = line.trim();
+                    if (line.startsWith("#") || line.isEmpty()) {
+                        continue; //ignore empty lines and comments
+                    }
+                    /*possible lines
+                     * categorical:
+                     * <parameter_name> {<value 1>, ..., <value N>} [<default value>]
+                     * continous integer or double (with possible log scale)
+                     * <parameter_name> [<min value>, <max value>] [<default value>] [i] [l]
+                     *  now we have only the conditionals parameters of the form
+                     * <child name> | <parent name> in {<parent val1>, ..., <parent valK>}
+                     */
+                    int pos = line.indexOf(" "); //once the first white space has been found we have the
+                    String paramName = line.substring(0, pos); //parameter name
+                    String paramDefinition = line.substring(paramName.length()).trim(); //contains the definition of the paramter
+                    //System.out.print(paramName + " : ");
+                    if (paramDefinition.isEmpty()) {
+                        message.append("Error at line: ");
+                        message.append(lineNr);
+                        message.append("the definition of the paramter is empty!\n");
+                    }
+                    if (paramDefinition.charAt(0) == '{') { //we have a categorical parameter
+                        //System.out.print(" is categorical with values: ");
+                        int endIx = paramDefinition.indexOf('}');
+                        if (endIx == -1) {
+                            message.append("Error at line");
+                            message.append(lineNr);
+                            break;
+                        }
+                        String[] vals = paramDefinition.substring(1, endIx).split(",");
+                        for (int idxVals = 0; idxVals < vals.length; idxVals++) {
+                            vals[idxVals] = vals[idxVals].trim();
+                            //System.out.print(vals[idxVals] + ", ");
+                        }
+                        //System.out.println();
+                        Parameter p = new Parameter(paramName, new CategoricalDomain(vals));
+                        parameters.add(p);
+                        allParamNames.add(p.getName());
+                    } else if (paramDefinition.charAt(0) == '[') {
+                        int endIx = paramDefinition.indexOf(']');
+                        if (endIx == -1) {
+                            message.append("Error at line");
+                            message.append(lineNr);
+                            break;
+                        }
+                        String range = paramDefinition.substring(1, endIx);
+
+                        int endDefaultIx = paramDefinition.indexOf(']', endIx + 1);
+                        boolean isInt = false;
+                        if (paramDefinition.length() > endDefaultIx + 1) {
+                            isInt = (paramDefinition.charAt(endDefaultIx + 1) == 'i');
+                        }
+
                         Parameter p = null;
                         if (isInt) {
+                            //System.out.println("is continous integer");
                             int low = Integer.valueOf(range.split(",")[0]);
+                            //System.out.print(low + "..");
                             int high = Integer.valueOf(range.split(",")[1]);
-                            p = new Parameter(param, new IntegerDomain(low, high));
+                            //System.out.println(high);
+                            p = new Parameter(paramName, new IntegerDomain(low, high));
                         } else {
+                            //System.out.println("is continous real");
                             double low = Double.valueOf(range.split(",")[0]);
+                            //System.out.print(low + "..");
                             double high = Double.valueOf(range.split(",")[1]);
-                            p = new Parameter(param, new RealDomain(low, high));
+                            //System.out.println(high);
+                            p = new Parameter(paramName, new RealDomain(low, high));
                         }
                         parameters.add(p);
-                    } else if (line.charAt(param.length() + 1) == '{') {
-                        int endIx = line.indexOf('}', param.length() + 2);
-                        String[] vals = line.substring(param.length() + 2, endIx).split(",");
-                        
-                        Parameter p = new Parameter(param, new CategoricalDomain(vals));
-                        parameters.add(p);
+                        allParamNames.add(p.getName());
+                    } else if (paramDefinition.charAt(0) == '|') { //we have a conditional parameter of the form:
+                        //<child name> | <parent name> in {<parent val1>, ..., <parent valK>}
+                        //add the child param to the list of conditioned parameters
+                        //parse the parent parameter
+                        paramDefinition = paramDefinition.substring(1, paramDefinition.length()).trim(); //skip the "| " part
+                        int endIdx = paramDefinition.indexOf(' ');
+                        if (endIdx == -1) {
+                            message.append("Error at line");
+                            message.append(lineNr);
+                            break;
+                        }
+                        String parentParamName = paramDefinition.substring(0, endIdx);
+                        //System.out.println("found parent parameter: " + parentParamName);
+                        //Check whether the parent and child paramter are already in the paramter table
+                        if (!allParamNames.contains(paramName)) {
+                            message.append("Error at line: ");
+                            message.append(lineNr);
+                            message.append("! Conditional child parameter found that was not specified yet!\n");
+//                            JOptionPane.showMessageDialog(this, "Error at line: " + lineNr + "! Conditional child parameter found that was not specified yet!", "Parameter file misformed!", JOptionPane.ERROR_MESSAGE);
+                        }
+                        if (!allParamNames.contains(parentParamName)) {
+                            message.append("Error at line: ");
+                            message.append(lineNr);
+                            message.append("! Conditional parent parameter found that was not specified yet!\n");
+                            //JOptionPane.showMessageDialog(this, "Error at line: " + lineNr + "! Conditional parent parameter found that was not specified yet!", "Parameter file misformed!", JOptionPane.ERROR_MESSAGE);
+                        }
+                        childParams.add(paramName);//add the child to the list of conditioned parameter
+                        parentParams.add(parentParamName); //add the parent parameter name to the list
+                        paramDefinition = paramDefinition.substring(endIdx + 1, paramDefinition.length()).trim();
+                        if (!paramDefinition.startsWith("in")) {
+                            message.append("Error at line: ");
+                            message.append(lineNr);
+                            message.append("! Conditional parameter: ");
+                            message.append(paramName);
+                            message.append(" but no \"in\" key found\n");
+                            //JOptionPane.showMessageDialog(this, "Error at line: " + lineNr + "! Conditional parameter: " + paramName + " but no \"in\" key found!", "Parameter file misformed!", JOptionPane.ERROR_MESSAGE);
+                        }
+
+                        paramDefinition = paramDefinition.substring(2, paramDefinition.length()).trim();
+                        ArrayList<String> parentWithValues = new ArrayList<String>();
+                        parentWithValues.add(parentParamName); //first Element is the parent name
+                        if (paramDefinition.charAt(0) == '{') {
+                            int endIx = paramDefinition.indexOf('}');
+                            if (endIx == -1) {
+                                message.append("Error at line");
+                                message.append(lineNr);
+                                break;
+                            }
+                            String[] vals = paramDefinition.substring(1, endIx).split(",");
+                            for (String value : vals) {
+                                parentWithValues.add(value.trim());
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Error at line: " + lineNr + "! Conditional parameter: " + paramName + " but no conditional values defintion starting with \"{\"!", "Parameter file misformed!", JOptionPane.ERROR_MESSAGE);
+                        }
+                        if (conditionalParams.contains(new Conditional(parentWithValues))) {
+                            for (Conditional cond : conditionalParams) {
+                                if (cond.condParamWithValues.equals(parentWithValues)) {
+                                    cond.addChild(paramName);
+                                }
+                            }
+                        } else {
+                            conditionalParams.add(new Conditional(paramName, parentWithValues));
+                        }
                     }
                 }
+                if (parameters == null || parameters.isEmpty()) { //stop if no parameters are present
+                    JOptionPane.showMessageDialog(this, "No parameters specified yet.", "Parameters missing", JOptionPane.INFORMATION_MESSAGE);
+                }
+                graph.removeCells(graph.getChildVertices(graph.getDefaultParent())); //clean the graph if a graph alreaday exists
+                Set<Node> nodes = new HashSet<Node>();
+                List<Edge> edges = new LinkedList<Edge>();
+                AndNode startNode = new AndNode(null, null); //generate the start AND node
+                nodes.add(startNode);
+                for (Parameter parameter : parameters) {
+                    //if the parameter is not conditioned and it does not occur as a parent or if it is a parent but has real/integer domain
+                    //we add it with its full domain
+                    if (!childParams.contains(parameter.getName())) {
+                        if (!parentParams.contains(parameter.getName()) || (parameter.getDomain().getName().equalsIgnoreCase(RealDomain.name)) || (parameter.getDomain().getName().equalsIgnoreCase(IntegerDomain.name))) {
+                            OrNode orNode = new OrNode(parameter);
+                            AndNode andNode = new AndNode(parameter, parameter.getDomain());
+                            edges.add(new Edge(startNode, orNode, 0));
+                            edges.add(new Edge(orNode, andNode, 0));
+                            nodes.add(orNode);
+                            nodes.add(andNode);
+                        }
+                    }
+                }
+                for (Parameter parameter : parameters) {
+                    //if the parameter is not conditioned (a child) but is a parent
+                    if (!childParams.contains(parameter.getName())) {
+                        if (parentParams.contains(parameter.getName())) {
+                            //add the node as an or node!
+                            OrNode orNode = new OrNode(parameter);
+                            nodes.add(orNode);
+                            edges.add(new Edge(startNode, orNode, 0));
+                            CategoricalDomain cat = null;
+                            HashSet<String> parentValues = new HashSet<String>();
+                            //go throgh all conditionals and get the domains of the condition and create as and nodes.
+                            //collect all values of conditionals and the rest of the values are added as extra and node
+                            //   System.out.println("searching for parent parameter :" + parameter.getName());
+                            for (Conditional condi : conditionalParams) {
+                                if (condi.condParamWithValues.get(0).equals(parameter.getName())) {
+                                    //get conditional values
+                                    HashSet<String> vals = new HashSet<String>();
+                                    //System.out.println("Found specification: " + condi.condParamWithValues.toString());
+                                    for (int idx = 1; idx < condi.condParamWithValues.size(); idx++) {//skip the parent name
+                                        vals.add(condi.condParamWithValues.get(idx));//Add the values to vals and to parentValues
+                                        parentValues.add(condi.condParamWithValues.get(idx));
+                                    }
+                                    cat = new CategoricalDomain(vals);
+                                    AndNode andNode = new AndNode(parameter, cat);//domain and node
+                                    andNode.setId(vals.toString());
+                                    edges.add(new Edge(orNode, andNode, 0));
+                                    nodes.add(andNode);
+                                    //go through the list of children and add them if not already added!!!!
+                                    for (String child : condi.childrenParams) {
+                                        for (Parameter paramChild : parameters) {
+                                            if (paramChild.getName().equals(child)) {
+                                                OrNode orNode2 = new OrNode(paramChild);
+                                                if (nodes.contains(orNode2)) {
+                                                    for (Node node : nodes) {
+                                                        if (node.equals(orNode2)) {
+                                                            // System.out.println("ornode already in the graph");
+                                                            edges.add(new Edge(andNode, node, 0));
+                                                            break;
+                                                        }
+                                                    }
+                                                } else {
+                                                    edges.add(new Edge(andNode, orNode2, 0));
+                                                    AndNode andNode2 = new AndNode(paramChild, paramChild.getDomain());
+                                                    andNode2.setId(paramChild.getDomain().toString());
+                                                    edges.add(new Edge(orNode2, andNode2, 0));
+                                                    nodes.add(orNode2);
+                                                    nodes.add(andNode2);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            //check which values of the parent where not contained in and nodes of children and add this values as an and node
+                            Set<String> allValues = ((CategoricalDomain) (parameter.getDomain())).getCategories();
+                            // System.out.println("Parmeter " + parameter.getName() + " has categories" + allValues.toString());
+                            HashSet<String> valuesToAdd = new HashSet<String>();
+
+                            for (String value : allValues) {
+                                if (!parentValues.contains(value)) {
+                                    valuesToAdd.add(value);
+                                }
+                            }
+                            //System.out.println("Mising values: " + valuesToAdd);
+                            if (!valuesToAdd.isEmpty()) {
+                                CategoricalDomain d = new CategoricalDomain(valuesToAdd);
+                                // System.out.println("Missing Domain" + d.toString());
+                                AndNode restAndNode = new AndNode(parameter, d);
+                                //System.out.println("And Node : "+restAndNode);
+                                restAndNode.setId(valuesToAdd.toString());
+                                nodes.add(restAndNode);
+                                edges.add(new Edge(orNode, restAndNode, 0));
+
+                            }
+                        }
+                    }
+                }
+                renderGraph(nodes, edges, startNode);
+
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
@@ -857,8 +1130,11 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             } catch (IOException ex) {
                 Logger.getLogger(ParameterGraphEditor.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            JOptionPane.showMessageDialog(ParameterGraphEditor.this, "Parameter domains imported", "Parameter domains imported", JOptionPane.INFORMATION_MESSAGE);
+            if (message.length() != 0) {
+                JOptionPane.showMessageDialog(ParameterGraphEditor.this, message.toString(), "Errors in parameter specification!", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            JOptionPane.showMessageDialog(ParameterGraphEditor.this, "Parameter specification imported and graph generated", "SMAC parameter import", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnImportSMACStyleParamsActionPerformed
 
