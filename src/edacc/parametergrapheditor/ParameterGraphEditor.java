@@ -821,22 +821,34 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         fc.showOpenDialog(this);
         HashSet<String> childParams = new HashSet<String>();
         HashSet<String> parentParams = new HashSet<String>();
+        HashSet<String> includedParams = new HashSet<String>();
         StringBuilder message = new StringBuilder();
         class Conditional {
 
             HashSet<String> childrenParams;
             ArrayList<String> condParamWithValues;
+            boolean included; //is true once this node has been added to the graph
+
+            public boolean isIncluded() {
+                return included;
+            }
+
+            public void setIncluded(boolean included) {
+                this.included = included;
+            }
 
             Conditional(String child, ArrayList<String> condparamv) {
                 this.childrenParams = new HashSet<String>();
                 this.childrenParams.add(child);
                 this.condParamWithValues = condparamv;
+                this.included = false;
 
             }
 
             Conditional(ArrayList<String> condparamv) {
                 this.childrenParams = new HashSet<String>();
                 this.condParamWithValues = condparamv;
+                this.included = false;
 
             }
 
@@ -1030,9 +1042,16 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 List<Edge> edges = new LinkedList<Edge>();
                 AndNode startNode = new AndNode(null, null); //generate the start AND node
                 nodes.add(startNode);
+                //a case splitting has to be done here
+                //parent child case
+                // 0        0   1
+                // 0        1   2   add with full domain while adding the parents
+                // 1        0   3
+                // 1        1   4
                 for (Parameter parameter : parameters) {
                     //if the parameter is not conditioned and it does not occur as a parent or if it is a parent but has real/integer domain
                     //we add it with its full domain
+                    //case 1
                     if (!childParams.contains(parameter.getName())) {
                         if (!parentParams.contains(parameter.getName()) || (parameter.getDomain().getName().equalsIgnoreCase(RealDomain.name)) || (parameter.getDomain().getName().equalsIgnoreCase(IntegerDomain.name))) {
                             OrNode orNode = new OrNode(parameter);
@@ -1044,83 +1063,159 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                         }
                     }
                 }
-                for (Parameter parameter : parameters) {
-                    //if the parameter is not conditioned (a child) but is a parent
-                    if (!childParams.contains(parameter.getName())) {
-                        if (parentParams.contains(parameter.getName())) {
-                            //add the node as an or node!
-                            OrNode orNode = new OrNode(parameter);
-                            nodes.add(orNode);
-                            edges.add(new Edge(startNode, orNode, 0));
-                            CategoricalDomain cat = null;
-                            HashSet<String> parentValues = new HashSet<String>();
-                            //go throgh all conditionals and get the domains of the condition and create as and nodes.
-                            //collect all values of conditionals and the rest of the values are added as extra and node
-                            //   System.out.println("searching for parent parameter :" + parameter.getName());
-                            for (Conditional condi : conditionalParams) {
-                                if (condi.condParamWithValues.get(0).equals(parameter.getName())) {
-                                    //get conditional values
-                                    HashSet<String> vals = new HashSet<String>();
-                                    //System.out.println("Found specification: " + condi.condParamWithValues.toString());
-                                    for (int idx = 1; idx < condi.condParamWithValues.size(); idx++) {//skip the parent name
-                                        vals.add(condi.condParamWithValues.get(idx));//Add the values to vals and to parentValues
-                                        parentValues.add(condi.condParamWithValues.get(idx));
-                                    }
-                                    cat = new CategoricalDomain(vals);
-                                    AndNode andNode = new AndNode(parameter, cat);//domain and node
-                                    andNode.setId(vals.toString());
-                                    edges.add(new Edge(orNode, andNode, 0));
-                                    nodes.add(andNode);
-                                    //go through the list of children and add them if not already added!!!!
-                                    for (String child : condi.childrenParams) {
-                                        for (Parameter paramChild : parameters) {
-                                            if (paramChild.getName().equals(child)) {
-                                                OrNode orNode2 = new OrNode(paramChild);
-                                                if (nodes.contains(orNode2)) {
-                                                    for (Node node : nodes) {
-                                                        if (node.equals(orNode2)) {
-                                                            // System.out.println("ornode already in the graph");
-                                                            edges.add(new Edge(andNode, node, 0));
-                                                            break;
+                //pass through all conditional parameters until they have been all inserted in the graph
+                //it is possible that the conditionalParams are passed multiple times until the parents have been included
+                boolean allInserted = false; //all parameters insterted in the graph?
+                int iteration = 0;
+                while (!allInserted) {
+                    iteration++;
+                    //search for a node that was not added to the graph
+                    Conditional currentCond = null;
+                    Parameter currentParameter = null;
+                    boolean found = false;
+                    for (Conditional conditional : conditionalParams) {
+                        if (!conditional.isIncluded()) {
+                            found = true;
+                            currentCond = conditional;
+                            for (Parameter parameter : parameters) {
+                                if (parameter.getName().equals(conditional.condParamWithValues.get(0))) {
+                                    currentParameter = parameter;
+                                    break;
+                                }
+                            }
+                            System.out.println("Found Paramter: " + currentParameter.getName() + " with conditional: " + currentCond.condParamWithValues);
+                            //if the parameter is a parent add it with domain splitting
+                            //case 3
+                            if (parentParams.contains(currentParameter.getName())) {
+                                //add the node as an or node!
+                                OrNode orNode = new OrNode(currentParameter);
+
+                                boolean parentCreated = false;
+                                if (childParams.contains(currentParameter.getName())) {
+                                    //we have to find the parent node with its domain where to draw the edge
+                                    for (Conditional condi : conditionalParams) {
+                                        if (condi.getChildren().contains(currentParameter.getName())) {
+                                            String parent = condi.condParamWithValues.get(0);
+                                            HashSet<String> vals = new HashSet<String>();
+                                            for (int idx = 1; idx < condi.condParamWithValues.size(); idx++) {//skip the parent name
+                                                vals.add(condi.condParamWithValues.get(idx));//Add the values to vals and to parentValues
+                                            }
+                                            CategoricalDomain cat = new CategoricalDomain(vals);
+                                            for (Parameter par : parameters) {
+                                                if (par.getName().equals(parent)) {
+                                                    AndNode parentDomainNode = new AndNode(par, cat);//domain and node
+                                                    parentDomainNode.setId(vals.toString());
+                                                    if (!nodes.contains(parentDomainNode)) {
+                                                        System.out.println("We have a problem, the parent: " + parentDomainNode.toString() + "  was not created yet!");
+                                                        break;
+                                                    } else {
+                                                        for (Node nod : nodes) {
+                                                            if (nod.equals(parentDomainNode)) {
+                                                                nodes.add(orNode);
+                                                                currentCond.setIncluded(true);
+                                                                edges.add(new Edge(nod, orNode, 0));
+                                                                parentCreated = true;
+                                                                break;
+                                                            }
                                                         }
                                                     }
-                                                } else {
-                                                    edges.add(new Edge(andNode, orNode2, 0));
-                                                    AndNode andNode2 = new AndNode(paramChild, paramChild.getDomain());
-                                                    andNode2.setId(paramChild.getDomain().toString());
-                                                    edges.add(new Edge(orNode2, andNode2, 0));
-                                                    nodes.add(orNode2);
-                                                    nodes.add(andNode2);
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    if (!parentCreated) //skip this parameter until parents created
+                                    {
+                                        System.out.println("Skipped parameter: " + currentParameter.getName());
+                                        continue;
+                                    }
+                                } else {
+
+                                    nodes.add(orNode);
+                                    edges.add(new Edge(startNode, orNode, 0));
+                                    System.out.println("Inserted parameter: " + currentParameter.getName());
+                                    currentCond.setIncluded(true);
+                                }
+                                //currentCond.setIncluded(true);
+                                CategoricalDomain cat = null;
+                                HashSet<String> parentValues = new HashSet<String>();
+                                //go throgh all conditionals and get the domains of the condition and create as and nodes.
+                                //collect all values of conditionals and the rest of the values are added as extra and node
+                                //System.out.println("searching for parent parameter :" + parameter.getName());
+                                for (Conditional condi : conditionalParams) {
+                                    if (condi.condParamWithValues.get(0).equals(currentParameter.getName())) {
+                                        //get conditional values
+                                        HashSet<String> vals = new HashSet<String>();
+                                        //System.out.println("Found specification: " + condi.condParamWithValues.toString());
+                                        for (int idx = 1; idx < condi.condParamWithValues.size(); idx++) {//skip the parent name
+                                            vals.add(condi.condParamWithValues.get(idx));//Add the values to vals and to parentValues
+                                            parentValues.add(condi.condParamWithValues.get(idx));
+                                        }
+                                        cat = new CategoricalDomain(vals);
+                                        AndNode andNode = new AndNode(currentParameter, cat);//domain and node
+                                        andNode.setId(vals.toString());
+                                        edges.add(new Edge(orNode, andNode, 0));
+                                        nodes.add(andNode);
+                                        //go through the list of children and add them if they are not parents
+                                        for (String child : condi.childrenParams) {
+                                            for (Parameter paramChild : parameters) {
+                                                if (!parentParams.contains(paramChild.getName())) { //if parent skip adding it because we have to add it as a parent and do a domain splitting
+                                                    if (paramChild.getName().equals(child)) {
+                                                        OrNode orNode2 = new OrNode(paramChild);
+                                                       /*if (nodes.contains(orNode2)) {
+                                                        for (Node node : nodes) {
+                                                        if (node.equals(orNode2)) {
+                                                        System.err.println("ornode already in the graph");
+                                                        edges.add(new Edge(andNode, node, 0));
+                                                        break;
+                                                        }
+                                                        }
+                                                        } else {*/ //case 2
+                                                        edges.add(new Edge(andNode, orNode2, 0));
+                                                        if (!parentParams.contains(child)) { //only if the child is not a parent it can be added with full domain
+                                                            AndNode andNode2 = new AndNode(paramChild, paramChild.getDomain());
+                                                            andNode2.setId(paramChild.getDomain().toString());
+                                                            edges.add(new Edge(orNode2, andNode2, 0));
+                                                            nodes.add(orNode2);
+                                                            nodes.add(andNode2);
+                                                        }
+                                                        //}
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            //check which values of the parent where not contained in and nodes of children and add this values as an and node
-                            Set<String> allValues = ((CategoricalDomain) (parameter.getDomain())).getCategories();
-                            // System.out.println("Parmeter " + parameter.getName() + " has categories" + allValues.toString());
-                            HashSet<String> valuesToAdd = new HashSet<String>();
+                                //check which values of the parent where not contained in and nodes of children and add this values as an and node
+                                Set<String> allValues = ((CategoricalDomain) (currentParameter.getDomain())).getCategories();
+                                // System.out.println("Parmeter " + parameter.getName() + " has categories" + allValues.toString());
+                                HashSet<String> valuesToAdd = new HashSet<String>();
 
-                            for (String value : allValues) {
-                                if (!parentValues.contains(value)) {
-                                    valuesToAdd.add(value);
+                                for (String value : allValues) {
+                                    if (!parentValues.contains(value)) {
+                                        valuesToAdd.add(value);
+                                    }
                                 }
-                            }
-                            //System.out.println("Mising values: " + valuesToAdd);
-                            if (!valuesToAdd.isEmpty()) {
-                                CategoricalDomain d = new CategoricalDomain(valuesToAdd);
-                                // System.out.println("Missing Domain" + d.toString());
-                                AndNode restAndNode = new AndNode(parameter, d);
-                                //System.out.println("And Node : "+restAndNode);
-                                restAndNode.setId(valuesToAdd.toString());
-                                nodes.add(restAndNode);
-                                edges.add(new Edge(orNode, restAndNode, 0));
+                                //System.out.println("Mising values: " + valuesToAdd);
+                                if (!valuesToAdd.isEmpty()) {
+                                    CategoricalDomain d = new CategoricalDomain(valuesToAdd);
+                                    // System.out.println("Missing Domain" + d.toString());
+                                    AndNode restAndNode = new AndNode(currentParameter, d);
+                                    //System.out.println("And Node : "+restAndNode);
+                                    restAndNode.setId(valuesToAdd.toString());
+                                    nodes.add(restAndNode);
+                                    edges.add(new Edge(orNode, restAndNode, 0));
 
+                                }
                             }
                         }
                     }
+                    if (!found) {
+                        allInserted = true;
+                    }
+
                 }
+                System.out.println("number of iterations needed to create the graph: "+ iteration);
                 renderGraph(nodes, edges, startNode);
 
             } catch (UnsupportedEncodingException ex) {
