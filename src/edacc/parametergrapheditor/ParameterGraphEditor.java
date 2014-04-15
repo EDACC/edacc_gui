@@ -1092,7 +1092,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
                                 boolean parentCreated = false;
                                 if (childParams.contains(currentParameter.getName())) {
-                                    //we have to find the parent node with its domain where to draw the edge
+                                    //we have to find the parent node (or multiple parents) with its domain where to draw the edge
                                     for (Conditional condi : conditionalParams) {
                                         if (condi.getChildren().contains(currentParameter.getName())) {
                                             String parent = condi.condParamWithValues.get(0);
@@ -1104,13 +1104,15 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                             for (Parameter par : parameters) {
                                                 if (par.getName().equals(parent)) {
                                                     AndNode parentDomainNode = new AndNode(par, cat);//domain and node
-                                                    parentDomainNode.setId(vals.toString());
+                                                    parentDomainNode.setId(cat.toString());
                                                     if (!nodes.contains(parentDomainNode)) {
                                                         System.out.println("We have a problem, the parent: " + parentDomainNode.toString() + "  was not created yet!");
                                                         break;
                                                     } else {
                                                         for (Node nod : nodes) {
                                                             if (nod.equals(parentDomainNode)) {
+                                                                if (nodes.contains(orNode))
+                                        System.out.println("1 The or node: " + orNode.getParameter().getName() +" is already in the graph ");
                                                                 nodes.add(orNode);
                                                                 currentCond.setIncluded(true);
                                                                 edges.add(new Edge(nod, orNode, 0));
@@ -1130,8 +1132,12 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                         continue;
                                     }
                                 } else {
-
+                                    if (nodes.contains(orNode)){
+                                        System.out.println("2 The or node: " + orNode.getParameter().getName() +" is already in the graph ");
+                                        System.out.println("The conditional looks like: "+currentCond.toString());
+                                    }
                                     nodes.add(orNode);
+
                                     edges.add(new Edge(startNode, orNode, 0));
                                     System.out.println("Inserted parameter: " + currentParameter.getName());
                                     currentCond.setIncluded(true);
@@ -1153,33 +1159,36 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                         }
                                         cat = new CategoricalDomain(vals);
                                         AndNode andNode = new AndNode(currentParameter, cat);//domain and node
-                                        andNode.setId(vals.toString());
-                                        edges.add(new Edge(orNode, andNode, 0));
+                                        andNode.setId(cat.toString());
                                         nodes.add(andNode);
+                                        edges.add(new Edge(orNode, andNode, 0));
+                                        
                                         //go through the list of children and add them if they are not parents
                                         for (String child : condi.childrenParams) {
-                                            for (Parameter paramChild : parameters) {
-                                                if (!parentParams.contains(paramChild.getName())) { //if parent skip adding it because we have to add it as a parent and do a domain splitting
+                                            if (!parentParams.contains(child)) { //if not a parent add it wiht full domain
+                                                for (Parameter paramChild : parameters) {
                                                     if (paramChild.getName().equals(child)) {
                                                         OrNode orNode2 = new OrNode(paramChild);
-                                                       /*if (nodes.contains(orNode2)) {
-                                                        for (Node node : nodes) {
-                                                        if (node.equals(orNode2)) {
-                                                        System.err.println("ornode already in the graph");
-                                                        edges.add(new Edge(andNode, node, 0));
-                                                        break;
-                                                        }
-                                                        }
-                                                        } else {*/ //case 2
-                                                        edges.add(new Edge(andNode, orNode2, 0));
-                                                        if (!parentParams.contains(child)) { //only if the child is not a parent it can be added with full domain
+                                                        if (nodes.contains(orNode2)) {
+                                                            for (Node node : nodes) {
+                                                                if (node.equals(orNode2)) {
+                                                             System.out.println("3 The or node: " + orNode2.getParameter().getName() +" is already in the graph ");
+                                                                    edges.add(new Edge(andNode, node, 0));
+                                                                    //edges.add(new Edge(node, andNode2, 0));
+                                                                    break;
+                                                                }
+                                                            }
+                                                        } else { //case 2
+                                                            edges.add(new Edge(andNode, orNode2, 0));
+                                                            nodes.add(orNode2);
                                                             AndNode andNode2 = new AndNode(paramChild, paramChild.getDomain());
                                                             andNode2.setId(paramChild.getDomain().toString());
-                                                            edges.add(new Edge(orNode2, andNode2, 0));
-                                                            nodes.add(orNode2);
                                                             nodes.add(andNode2);
+                                                            edges.add(new Edge(orNode2, andNode2, 0));
+                                                            condi.included = true;
                                                         }
-                                                        //}
+                                                        
+                                                        
                                                     }
                                                 }
                                             }
@@ -1202,7 +1211,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                     // System.out.println("Missing Domain" + d.toString());
                                     AndNode restAndNode = new AndNode(currentParameter, d);
                                     //System.out.println("And Node : "+restAndNode);
-                                    restAndNode.setId(valuesToAdd.toString());
+                                    restAndNode.setId(d.toString());
                                     nodes.add(restAndNode);
                                     edges.add(new Edge(orNode, restAndNode, 0));
 
