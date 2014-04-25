@@ -114,7 +114,6 @@ public class InstanceHasPropertyDAO {
         return new InstanceHasProperty(i, p, value);
     }
 
-
     public static void assign(List<Instance> inst) throws SQLException {
         if (inst.isEmpty()) {
             return;
@@ -136,11 +135,8 @@ public class InstanceHasPropertyDAO {
         } catch (Exception e) {
             throw new SQLException(e.getMessage() + e.getClass());
         }
-
-        for (Instance i : inst) {
-            InstanceHasProperty ihip = null;
-            i.getPropertyValues().put(ihip.getId(), ihip);
-        }
+        
+        
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT ihp.id, ihp.idInstance, ihp.idProperty, ihp.value "
@@ -247,23 +243,20 @@ public class InstanceHasPropertyDAO {
             Instance in = InstanceDAO.getById(rs.getInt("idInstance"));
             Property p = PropertyDAO.getById(rs.getInt("idProperty"));
             String value = rs.getString("value");
-            InstanceHasProperty ihp = new InstanceHasProperty();
-            ihp.setValue(value);
-            ihp.setInstance(in);
-            ihp.setInstanceProperty(p);
-            ihp.setId(rs.getInt("id"));
-            ihp.setSaved();
-            cache.cache(ihp);
-            if (idCache.get(ihp.getInstance().getId()) == null) {
+            InstanceHasProperty i = new InstanceHasProperty();
+            i.setValue(value);
+            i.setInstance(in);
+            i.setInstanceProperty(p);
+            i.setId(rs.getInt("id"));
+            i.setSaved();
+            cache.cache(i);
+            if (idCache.get(i.getInstance().getId()) == null) {
                 HashMap<Integer, Integer> tmp = new HashMap<Integer, Integer>();
-                tmp.put(ihp.getProperty().getId(), ihp.getId());
-                idCache.put(ihp.getInstance().getId(), tmp);
+                tmp.put(i.getProperty().getId(), i.getId());
+                idCache.put(i.getInstance().getId(), tmp);
             } else {
-                idCache.get(ihp.getInstance().getId()).put(ihp.getProperty().getId(), ihp.getId());
+                idCache.get(i.getInstance().getId()).put(i.getProperty().getId(), i.getId());
             }
-
-            // assign property to instance
-            in.getPropertyValues().put(ihp.getId(), ihp);
 
         }
         rs.close();
