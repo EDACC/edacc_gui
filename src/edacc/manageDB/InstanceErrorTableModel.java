@@ -51,7 +51,7 @@ public class InstanceErrorTableModel extends DefaultTableModel {
         if (instances.isEmpty()) {
             return String.class;
         } else {
-            return getValueAt(1, col).getClass();
+            return getValueAt(0, col).getClass();
         }
     }
 
