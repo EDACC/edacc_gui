@@ -58,7 +58,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                             if (taskView.isDisplayable()) {
                                 taskView.setVisible(true);
                             }
-                        } catch (Exception _) {
+                        } catch (Exception e) {
                             // happens if the task view is already disposed, i.e. the task is finished.
                         }
                     }
@@ -122,7 +122,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                             if (taskView.isDisplayable()) {
                                 taskView.setVisible(true);
                             }
-                        } catch (Exception _) {
+                        } catch (Exception e) {
                             // happens if the task view is already disposed, i.e. the task is finished.
                         }
                     }

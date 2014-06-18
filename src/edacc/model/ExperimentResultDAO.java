@@ -813,7 +813,7 @@ public class ExperimentResultDAO {
         if (curSt != null) {
             try {
                 curSt.cancel();
-            } catch (Exception _) {
+            } catch (Exception e) {
             }
         }
     }

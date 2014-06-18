@@ -1858,7 +1858,7 @@ public class ExperimentController {
                     }
                 }
             }
-        } catch (Exception _) {
+        } catch (Exception e) {
         }
         return res;
     }

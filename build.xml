@@ -91,11 +91,12 @@
         <echo>Copying dist-files</echo>
         <copy todir="${dist.dir}">
             <fileset file="dist-files/Experiment Mode - README.txt"/>
-            <fileset file="dist-files/AUTHORS"/>
-            <fileset file="dist-files/LICENSE"/>
-            <fileset file="dist-files/README"/>
+            <fileset file="AUTHORS"/>
+            <fileset file="LICENSE"/>
+            <fileset file="README.md"/>
+            <fileset file="dist-files/edacc"/>
         </copy>
-        <copy overwrite="true" tofile="${dist.dir}/README.TXT" file="dist-files/README" /> 
+        <chmod file="${dist.dir}/edacc" perm="700"/>
     </target>
 
     <target name="-pre-jar">
