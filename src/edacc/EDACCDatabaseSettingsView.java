@@ -65,13 +65,13 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                 this.txtDatabase.setText(map.get("database" + ext));
             }
             if (map.containsKey("port" + ext)) {
-                this.txtPort.setText(map.get("port"));
+                this.txtPort.setText(map.get("port" + ext));
             }
             if (map.containsKey("username" + ext)) {
                 this.txtUsername.setText(map.get("username" + ext));
             }
             if (map.containsKey("max_connections" + ext)) {
-                this.txtMaxConnections.setText(map.get("max_connections"));
+                this.txtMaxConnections.setText(map.get("max_connections" + ext));
             }
             if (map.containsKey("secured_connection" + ext)) {
                 this.chkUseSSL.setSelected(map.get("secured_connection" + ext).equalsIgnoreCase("true"));
@@ -96,6 +96,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         }
         ApplicationContext ctxt = EDACCApp.getApplication().getContext();
         Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        if (map == null) {
+            map = new HashMap<String, String>();
+        }
         map.put("hostname" + ext, txtHostname.getText());
         map.put("database" + ext, txtDatabase.getText());
         map.put("port" + ext, txtPort.getText());
@@ -119,6 +122,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         }
         ApplicationContext ctxt = EDACCApp.getApplication().getContext();
         Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        if (map == null) {
+            return;
+        }
         map.remove("hostname" + ext);
         map.remove("database" + ext);
         map.remove("port" + ext);
@@ -134,6 +140,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     private void reloadSessionNames() throws IOException {
         ApplicationContext ctxt = EDACCApp.getApplication().getContext();
         Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(connection_settings_filename);
+        if (map == null) {
+            map = new HashMap<String, String>();
+        }
         List<String> sessions = new LinkedList<String>();
         for (String key : map.keySet()) {
             if (key.startsWith("hostname") && key.length() >= 10) {
